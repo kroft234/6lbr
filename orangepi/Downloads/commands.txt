@@ -1,0 +1,130 @@
+# Показать дерево USB-устройств
+lsusb -t
+
+# Проверить виртуальные COM-порты
+ls /dev/ttyUSB*
+ls /dev
+
+# Выгружаем драйверы из памяти
+sudo modprobe -r ftdi_sio    # Удаляем драйвер FTDI-чипов
+sudo modprobe -r usbserial   # Удаляем основной драйвер USB-UARTT
+
+/////////////////////////Команды для установки драйвера//////////////////////////
+# Загружаем драйверы обратно
+sudo modprobe usbserial      # Загружаем основной драйвер
+sudo modprobe ftdi_sio       # Загружаем драйвер FTDI
+
+# Вручную добавляем ID в драйвер
+echo "0403 a6d1" | sudo tee /sys/bus/usb-serial/drivers/ftdi_sio/new_id
+/////////////////////////Команды для установки драйвера//////////////////////////
+
+# Финальная проверка
+ls -la /dev/ttyUSB*
+
+# Просмотр запущенных процессов
+sudo lsof /dev/ttyUSB1
+
+# Проверка прав доступа
+ls -l /dev/ttyUSB1
+
+# или, если у тебя просто называется 6lbr
+sudo systemctl stop 6lbr
+
+# Запустим службу
+sudo systemctl start 6lbr
+
+# Проверим статус
+sudo systemctl status 6lbr
+
+sudo systemctl restart 6lbr
+
+vim /etc/6lbr/6lbr.conf
+
+# Для логирования
+cat /var/log/6lbr.log
+cat /var/log/6lbr.err
+
+# Нужно для 6Lowpan
+make tunslip6
+sudo ./tunslip6 115200 -s /dev/ttyUSB1 fd00::1/64
+
+# Для просмотра соседей(маршрутов)
+curl -g "http://[<address-inside-the-brackets>]"
+
+# Чтобы убрать лишние пробелы
+sed -i 's/\r$//' lolo.sh
+
+#Для удаления deb пакета
+sudo dpkg -r cetic-6lbr
+sudo dpkg --purge cetic-6lbr
+
+-----------------Команды для Windows-------------------------
+# Указать адрес ISATAP-роутера
+netsh interface ipv6 isatap set router 192.168.7.2
+
+# Включить ISATAP-интерфейс
+netsh interface ipv6 isatap set state enabled
+
+# Проверить связь по IPv6
+ping -6 <IPv6 адрес>
+
+# Показать все IPv6-интерфейсы и их индексы
+netsh interface ipv6 show interface
+
+# Добавить маршрут для локальной подсети fd00::/64 через интерфейс с индексом 40 (обычно ISATAP)
+netsh interface ipv6 add route fd00::/64 40
+-----------------Команды для Windows-------------------------
+
+/////////////////////////// тест ///////////////////////////
+# Пытаемся отправить данные в порт
+echo "Hello UART" > /dev/ttyUSB0  
+# Смотрим результат: 0=успех, 1=ошибка
+echo $?                          
+
+# В одном терминале запустите minicom для мониторинга
+sudo apt-get install minicom
+minicom -b 115200 -D /dev/ttyUSB1
+
+/////////////////////////// тест ///////////////////////////
+
+//////////////////////Для IPV4/////////////////////////////
+1 компьтер
+route -p add 192.168.7.0 mask 255.255.255.0 192.168.5.20
+ping 192.168.7.1
+netsh advfirewall set allprofiles state off
+
+2 компьтер
+route -p add 192.168.5.0 mask 255.255.255.0 192.168.7.2
+ping 192.168.5.21
+
+Beglebone Black
+sed -i 's/\r$//' IPV4_START.sh # При ошибки лишний символов(скрипт с 3 нижними командами)
+# Написан скрипт IPV4_START
+sudo ip addr add 192.168.5.20/24 dev eth0
+ip addr show eth0
+sudo sysctl -w net.ipv4.ip_forward=1
+//////////////////////Для IPV4/////////////////////////////
+
+//////////////////////Для IPV6/////////////////////////////
+
+1 компьютер
+netsh interface ipv6 add address "Ethernet" fd00:1::2 #Ноут
+netsh interface ipv6 add route ::/0 "Ethernet" fd00:1::1 #Beglebone Black
+ping -6 fd00:1::1
+
+2 компьютер
+netsh interface ipv6 add address "Ethernet" fd00:2::2 #Ноут
+netsh interface ipv6 add route ::/0 "Ethernet" fd00:2::1 #Beglebone Black
+ping -6 fd00:2::1
+
+Beglebone Black
+sed -i 's/\r$//' IPV6_START.sh # При ошибки лишний символов(скрипт с 5 нижними командами)
+# Написан скрипт IPV6_START
+sudo sysctl -w net.ipv6.conf.all.forwarding=1
+sudo ip -6 addr add fd00:1::1/64 dev eth0
+sudo ip -6 addr add fd00:2::1/64 dev usb0
+# Нужны для ping rpl-border-router
+sudo sysctl -w net.ipv6.conf.eth0.proxy_ndp=1
+sudo ip -6 neigh add proxy <IPv6 адрес> dev eth0
+sudo ip -6 neigh add proxy fd00::212:4b00:40e:f3ed dev eth0
+/////////////////////Для IPV6/////////////////////////////

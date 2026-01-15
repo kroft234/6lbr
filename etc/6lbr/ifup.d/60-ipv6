@@ -1,0 +1,33 @@
+#!/bin/sh
+
+BR="br0"
+IPV6_ADDR="bbbb::100/64"
+
+# Ждём, пока bridge появится (до 5 сек)
+for i in 1 2 3 4 5; do
+    if ip link show "$BR" >/dev/null 2>&1; then
+        break
+    fi
+    sleep 1
+done
+
+# Если bridge так и не появился — выходим
+if ! ip link show "$BR" >/dev/null 2>&1; then
+    echo "6LBR: bridge $BR not found, skipping IPv6 setup"
+    exit 0
+fi
+
+# Назначаем IPv6, если ещё нет
+if ! ip -6 addr show dev "$BR" | grep -q "bbbb::100"; then
+    echo "6LBR: Assign IPv6 $IPV6_ADDR to $BR"
+    ip -6 addr add "$IPV6_ADDR" dev "$BR"
+fi
+
+# Добавляем маршрут для WSN-префикса aaaa::/64 через br0
+if ! ip -6 route show | grep -q "^aaaa::/64 .* br0"; then
+    echo "6LBR: Add IPv6 route aaaa::/64 via $BR"
+    ip -6 route add aaaa::/64 dev "$BR"
+fi
+
+
+
