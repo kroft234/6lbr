@@ -1,0 +1,2402 @@
+ dpkg-buildpackage -rfakeroot -us -uc -ui
+dpkg-buildpackage: info: source package cetic-6lbr
+dpkg-buildpackage: info: source version 1.4.O
+dpkg-buildpackage: info: source distribution unstable
+dpkg-buildpackage: info: source changed by 6lbr-team <6lbr@cetic.be>
+ dpkg-source --before-build 6lbr
+dpkg-buildpackage: info: host architecture armhf
+ fakeroot debian/rules clean
+dh clean 
+dh: Compatibility levels before 9 are deprecated (level 8 in use)
+   dh_auto_clean
+dh_auto_clean: Compatibility levels before 9 are deprecated (level 8 in use)
+	make -j1 distclean
+make[1]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+rm -f cetic-6lbr.native
+make[1]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+   dh_clean
+	rm -f debian/debhelper-build-stamp
+	rm -rf debian/.debhelper/
+dh_clean: Compatibility levels before 9 are deprecated (level 8 in use)
+	rm -f debian/cetic-6lbr.debhelper.log
+	rm -f -- debian/cetic-6lbr.substvars debian/files
+	rm -fr -- debian/cetic-6lbr/ debian/tmp/
+	find .  \( \( \
+		\( -path .\*/.git -o -path .\*/.svn -o -path .\*/.bzr -o -path .\*/.hg -o -path .\*/CVS -o -path .\*/.pc -o -path .\*/_darcs \) -prune -o -type f -a \
+	        \( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \
+		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \
+		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \
+		 -o -name TAGS -o \( -path '*/.deps/*' -a -name '*.P' \) \
+		\) -exec rm -f {} + \) -o \
+		\( -type d -a -name autom4te.cache -prune -exec rm -rf {} + \) \)
+ dpkg-source -b 6lbr
+dpkg-source: info: using source format '3.0 (native)'
+dpkg-source: info: building cetic-6lbr in cetic-6lbr_1.4.O.tar.xz
+dpkg-source: info: building cetic-6lbr in cetic-6lbr_1.4.O.dsc
+ debian/rules build
+dh build 
+dh: Compatibility levels before 9 are deprecated (level 8 in use)
+   dh_update_autotools_config
+   dh_auto_configure
+dh_auto_configure: Compatibility levels before 9 are deprecated (level 8 in use)
+   debian/rules override_dh_auto_build
+make[1]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native all
+make[2]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -rf bin
+mkdir -p bin
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_smart_bridge
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_SMARTBRIDGE=1 WITH_UDPCLIENT=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-rpl.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/udp-server/udp-server.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+./../../core/net/ipv6/uip-nd6.c:137:26: warning: ‘prefix’ defined but not used [-Wunused-variable]
+ static uip_ds6_prefix_t *prefix; /**  Pointer to a prefix list entry */
+                          ^~~~~~
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/rpl/rpl-icmp6.c
+  CC        ./../../core/net/rpl/rpl-of0.c
+  CC        ./../../core/net/rpl/rpl-dag.c
+  CC        ./../../core/net/rpl/rpl-timers.c
+  CC        ./../../core/net/rpl/rpl-ext-header.c
+  CC        ./../../core/net/rpl/rpl.c
+  CC        ./../../core/net/rpl/rpl-mrhof.c
+  CC        ./../../core/net/rpl/rpl-dag-root.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/rio.o obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_smart_bridge
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_rpl_relay
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_TRANSPARENTBRIDGE=1 CETIC_6LBR_LEARN_RPL_MAC=1 WITH_UDPCLIENT=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/udp-server/udp-server.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/rio.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_rpl_relay
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_full_transparent_bridge
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_TRANSPARENTBRIDGE=1 CETIC_6LBR_LEARN_RPL_MAC=0 WITH_UDPCLIENT=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/udp-server/udp-server.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/rio.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_full_transparent_bridge
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_router
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_ROUTER=1 WITH_UDPCLIENT=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-rpl.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/udp-server/udp-server.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/rpl/rpl-icmp6.c
+  CC        ./../../core/net/rpl/rpl-of0.c
+  CC        ./../../core/net/rpl/rpl-dag.c
+  CC        ./../../core/net/rpl/rpl-timers.c
+  CC        ./../../core/net/rpl/rpl-ext-header.c
+  CC        ./../../core/net/rpl/rpl.c
+  CC        ./../../core/net/rpl/rpl-mrhof.c
+  CC        ./../../core/net/rpl/rpl-dag-root.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/rio.o obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_router
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_ndp_router
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_ROUTER=1 CETIC_6LBR_NDP_ROUTER=1 WITH_UDPCLIENT=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/udp-server/udp-server.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/rio.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_ndp_router
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_6lr
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_6LR=1 WITH_UDPSERVER=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-rpl.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+./../../core/net/ipv6/uip-nd6.c:137:26: warning: ‘prefix’ defined but not used [-Wunused-variable]
+ static uip_ds6_prefix_t *prefix; /**  Pointer to a prefix list entry */
+                          ^~~~~~
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/rpl/rpl-icmp6.c
+  CC        ./../../core/net/rpl/rpl-of0.c
+  CC        ./../../core/net/rpl/rpl-dag.c
+  CC        ./../../core/net/rpl/rpl-timers.c
+  CC        ./../../core/net/rpl/rpl-ext-header.c
+  CC        ./../../core/net/rpl/rpl.c
+  CC        ./../../core/net/rpl/rpl-mrhof.c
+  CC        ./../../core/net/rpl/rpl-dag-root.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./../6lbr-demo/apps/udp-client/udp-client.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/udp-client.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/rio.o obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_6lr
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native clean
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+rm -f *~ *core core *.srec \
+*.lst *.map \
+*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+*.ce *.co
+rm -rf *.so obj_native/*.so
+rm -rf obj_native
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make TARGET=native bin/cetic_6lbr_rpl_root
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make TARGET=native CETIC_6LBR_ROUTER=1 CETIC_6LBR_ONE_ITF=1 WITH_UDPCLIENT=0
+make[4]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+mkdir obj_native
+  CC        ./../../apps/slip-cmd/cmd.c
+  CC        ./../../apps/slip-cmd/packetutils.c
+  CC        ./apps/6lbr-webserver/httpd.c
+  CC        ./apps/6lbr-webserver/httpd-cgi.c
+  CC        ./apps/6lbr-webserver/httpd-urlconv.c
+  CC        ./apps/6lbr-webserver/webserver.c
+  CC        ./apps/6lbr-webserver/webserver-utils.c
+  CC        ./apps/6lbr-webserver/webserver-main.c
+  CC        ./apps/6lbr-webserver/webserver-network.c
+  CC        ./apps/6lbr-webserver/webserver-config.c
+  CC        ./apps/6lbr-webserver/webserver-statistics.c
+  CC        ./apps/6lbr-webserver/webserver-admin.c
+  CC        ./apps/6lbr-webserver/webserver-log.c
+  CC        ./apps/6lbr-webserver/webserver-rpl.c
+  CC        ./apps/6lbr-webserver/webserver-file.c
+  CC        ./apps/6lbr-webserver/webserver-sensors.c
+  CC        ./apps/6lbr-webserver/webserver-sensor.c
+  CC        ./apps/udp-server/udp-server.c
+  CC        ./apps/node-config/node-config.c
+  CC        ./apps/node-config/node-config-ip64-ports.c
+  CC        ./apps/node-config/node-config-file.c
+  CC        ./apps/node-config/ini.c
+  CC        ./apps/node-info/node-info.c
+  CC        ./apps/dns-proxy/dns-proxy.c
+  CC        ./../../apps/er-coap/er-coap.c
+  CC        ./../../apps/er-coap/er-coap-engine.c
+  CC        ./../../apps/er-coap/er-coap-transactions.c
+  CC        ./../../apps/er-coap/er-coap-observe.c
+./../../apps/er-coap/er-coap-observe.c: In function ‘coap_observe_handler’:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: unused variable ‘content’ [-Wunused-variable]
+   static char content[16];
+               ^~~~~~~
+At top level:
+./../../apps/er-coap/er-coap-observe.c:243:15: warning: ‘content’ defined but not used [-Wunused-variable]
+  CC        ./../../apps/er-coap/er-coap-separate.c
+  CC        ./../../apps/er-coap/er-coap-res-well-known-core.c
+  CC        ./../../apps/er-coap/er-coap-block1.c
+  CC        ./../../apps/er-coap/er-coap-observe-client.c
+  CC        ./../../apps/er-coap/er-coap-udp.c
+  CC        ./../../apps/rest-engine/rest-engine.c
+  CC        ./../6lbr-demo/apps/coap/coap-server.c
+  CC        ./../6lbr-demo/apps/coap/block-transfer.c
+  CC        ./../6lbr-demo/apps/coap/coap-common.c
+  CC        ./../6lbr-demo/apps/coap/coap-push.c
+  CC        ./../6lbr-demo/apps/coap/core-interface.c
+  CC        ./../6lbr-demo/apps/coap/coap-binding.c
+  CC        ./../6lbr-demo/apps/coap/coap-linked-batch.c
+  CC        ./../6lbr-demo/apps/coap/rd-client.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-text.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-json.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-senml.c
+  CC        ./../6lbr-demo/apps/coap/rest-types/rest-type-xml.c
+  CC        ./../../core/ctk/ctk-conio.c
+  CC        ./../../platform/native/./contiki-main.c
+./../../platform/native/./contiki-main.c:138:37: warning: ‘stdin_fd’ defined but not used [-Wunused-const-variable=]
+ const static struct select_callback stdin_fd = {
+                                     ^~~~~~~~
+  CC        ./../../platform/native/./clock.c
+  CC        ./../../core/dev/leds.c
+  CC        ./../../platform/native/dev/leds-arch.c
+  CC        ./../../platform/native/dev/button-sensor.c
+  CC        ./../../platform/native/dev/pir-sensor.c
+  CC        ./../../platform/native/dev/vib-sensor.c
+  CC        ./../../platform/native/dev/xmem.c
+  CC        ./../../core/lib/sensors.c
+  CC        ./../../platform/native/dev/irq.c
+  CC        ./../../core/cfs/cfs-posix.c
+  CC        ./../../core/cfs/cfs-posix-dir.c
+  CC        ./../../platform/native/ctk/ctk-curses.c
+./../../platform/native/ctk/ctk-curses.c: In function ‘console_cputc’:
+./../../platform/native/ctk/ctk-curses.c:269:3: warning: case label value is less than minimum value for type
+   case CH_ULCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:272:3: warning: case label value is less than minimum value for type
+   case CH_LLCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:275:3: warning: case label value is less than minimum value for type
+   case CH_URCORNER:
+   ^~~~
+./../../platform/native/ctk/ctk-curses.c:278:3: warning: case label value is less than minimum value for type
+   case CH_LRCORNER:
+   ^~~~
+  CC        ./../../cpu/native/net/tapdev-drv.c
+  CC        ./../../cpu/native/net/tapdev6.c
+./../../cpu/native/net/tapdev6.c: In function ‘tapdev_init’:
+./../../cpu/native/net/tapdev6.c:334:3: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   system(buf);
+   ^~~~~~~~~~~
+  CC        ./../../cpu/native/./mtarch.c
+  CC        ./../../cpu/native/./rtimer-arch.c
+  CC        ./../../core/loader/elfloader-stub.c
+  CC        ./../../cpu/native/./watchdog.c
+  CC        ./../../cpu/native/dev/eeprom.c
+  CC        ./../../core/net/llsec/noncoresec/noncoresec.c
+  CC        ./../../core/net/ip64/ip64-dns64.c
+  CC        ./../../core/net/ip64/ip64-arp.c
+./../../core/net/ip64/ip64-arp.c:97:23: warning: ‘broadcast_ipaddr’ defined but not used [-Wunused-const-variable=]
+ static const uint16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+                       ^~~~~~~~~~~~~~~~
+  CC        ./../../core/net/ip64/ip64-ipv4-dhcp.c
+  CC        ./../../core/net/ip64/ip64-null-driver.c
+  CC        ./../../core/net/ip64/ip64-eth-interface.c
+  CC        ./../../core/net/ip64/ip64.c
+  CC        ./../../core/net/ip64/ip64-special-ports.c
+  CC        ./../../core/net/ip64/ip64-slip-interface.c
+  CC        ./../../core/net/ip64/ip64-addrmap.c
+  CC        ./../../core/net/ip64/ip64-dhcpc.c
+  CC        ./../../core/net/ip64/ip64-eth.c
+  CC        ./../../core/sys/autostart.c
+  CC        ./../../core/sys/ctimer.c
+  CC        ./../../core/sys/energest.c
+  CC        ./../../core/sys/arg.c
+  CC        ./../../core/sys/stimer.c
+  CC        ./../../core/sys/etimer.c
+  CC        ./../../core/sys/compower.c
+  CC        ./../../core/sys/process.c
+  CC        ./../../core/sys/rtimer.c
+  CC        ./../../core/sys/mt.c
+  CC        ./../../core/sys/procinit.c
+  CC        ./../../core/sys/timer.c
+  CC        ./../../core/dev/serial-line.c
+  CC        ./../../core/dev/slip.c
+  CC        ./../../core/dev/nullradio.c
+  CC        ./../../core/lib/settings.c
+  CC        ./../../core/lib/crc16.c
+  CC        ./../../core/lib/me.c
+  CC        ./../../core/lib/ringbuf.c
+  CC        ./../../core/lib/ifft.c
+  CC        ./../../core/lib/me_tabs.c
+  CC        ./../../core/lib/ccm-star.c
+  CC        ./../../core/lib/mmem.c
+  CC        ./../../core/lib/list.c
+  CC        ./../../core/lib/aes-128.c
+  CC        ./../../core/lib/trickle-timer.c
+  CC        ./../../core/lib/print-stats.c
+  CC        ./../../core/lib/memb.c
+  CC        ./../../core/lib/petsciiconv.c
+  CC        ./../../core/lib/gcr.c
+  CC        ./../../core/lib/random.c
+  CC        ./../../core/lib/assert.c
+  CC        ./../../core/net/ipv6/uip-icmp6.c
+  CC        ./../../core/net/ipv6/uip-ds6.c
+  CC        ./../../core/net/ipv6/uip-ds6-route.c
+  CC        ./../../core/net/ipv6/uip6.c
+  CC        ./../../core/net/ipv6/uip-ds6-nbr.c
+  CC        ./../../core/net/ipv6/uip-nd6.c
+  CC        ./../../core/net/ipv6/sicslowpan.c
+  CC        ./../../core/net/ip/slipdev.c
+  CC        ./../../core/net/ip/dhcpc.c
+  CC        ./../../core/net/ip/uip-packetqueue.c
+  CC        ./../../core/net/ip/tcp-socket.c
+  CC        ./../../core/net/ip/uip-debug.c
+  CC        ./../../core/net/ip/ip64-addr.c
+  CC        ./../../core/net/ip/uip-udp-packet.c
+  CC        ./../../core/net/ip/psock.c
+  CC        ./../../core/net/ip/tcpip.c
+  CC        ./../../core/net/ip/resolv.c
+  CC        ./../../core/net/ip/uip-nameserver.c
+  CC        ./../../core/net/ip/uip-split.c
+  CC        ./../../core/net/ip/udp-socket.c
+  CC        ./../../core/net/ip/simple-udp.c
+  CC        ./../../core/net/ip/uiplib.c
+  CC        ./../../core/net/rpl/rpl-icmp6.c
+  CC        ./../../core/net/rpl/rpl-of0.c
+  CC        ./../../core/net/rpl/rpl-dag.c
+  CC        ./../../core/net/rpl/rpl-timers.c
+  CC        ./../../core/net/rpl/rpl-ext-header.c
+  CC        ./../../core/net/rpl/rpl.c
+  CC        ./../../core/net/rpl/rpl-mrhof.c
+  CC        ./../../core/net/rpl/rpl-dag-root.c
+  CC        ./../../core/net/queuebuf.c
+  CC        ./../../core/net/nbr-table.c
+  CC        ./../../core/net/packetbuf.c
+  CC        ./../../core/net/netstack.c
+  CC        ./../../core/net/linkaddr.c
+  CC        ./../../core/net/mac/framer-nullmac.c
+  CC        ./../../core/net/mac/nullmac.c
+  CC        ./../../core/net/mac/nullrdc-noframer.c
+  CC        ./../../core/net/mac/mac-sequence.c
+  CC        ./../../core/net/mac/framer-802154.c
+  CC        ./../../core/net/mac/csma.c
+  CC        ./../../core/net/mac/frame802154.c
+  CC        ./../../core/net/mac/mac.c
+  CC        ./../../core/net/mac/framer.c
+  CC        ./../../core/net/mac/phase.c
+  CC        ./../../core/net/mac/nullrdc.c
+  CC        ./../../core/ctk/ctk-textentry-cmdline.c
+  CC        ./../../core/ctk/ctk-filedialog.c
+./../../core/ctk/ctk-filedialog.c: In function ‘ctk_filedialog_eventhandler’:
+./../../core/ctk/ctk-filedialog.c:158:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       if((ctk_arch_key_t)data == CH_CURS_UP) {
+          ^
+./../../core/ctk/ctk-filedialog.c:165:17: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       } else if((ctk_arch_key_t)data == CH_CURS_DOWN) {
+                 ^
+  CC        ./../../core/ctk/ctk-textentry-checkbox.c
+./../../core/ctk/ctk-textentry-checkbox.c: In function ‘ctk_textentry_checkbox_input’:
+./../../core/ctk/ctk-textentry-checkbox.c:57:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+  CC        ./../../core/ctk/ctk-textentry-multiline.c
+./../../core/ctk/ctk-textentry-multiline.c: In function ‘ctk_textentry_multiline_input’:
+./../../core/ctk/ctk-textentry-multiline.c:56:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk-textentry-multiline.c:64:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+  CC        ./../../core/ctk/ctk.c
+./../../core/ctk/ctk.c: In function ‘widget_redraw’:
+./../../core/ctk/ctk.c:855:22: warning: variable ‘window’ set but not used [-Wunused-but-set-variable]
+   struct ctk_window *window;
+                      ^~~~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1203:3: warning: case label value is less than minimum value for type
+   case CH_CURS_LEFT:
+   ^~~~
+./../../core/ctk/ctk.c:1209:3: warning: case label value is less than minimum value for type
+   case CH_CURS_RIGHT:
+   ^~~~
+./../../core/ctk/ctk.c:1215:3: warning: case label value is less than minimum value for type
+   case CH_CURS_UP:
+   ^~~~
+./../../core/ctk/ctk.c:1220:3: warning: case label value is less than minimum value for type
+   case CH_CURS_DOWN:
+   ^~~~
+./../../core/ctk/ctk.c:1236:3: warning: case label value is less than minimum value for type
+   case CTK_CONF_WIDGETUP_KEY:
+   ^~~~
+./../../core/ctk/ctk.c: In function ‘process_thread_ctk_process’:
+./../../core/ctk/ctk.c:1744:6: warning: case label value is less than minimum value for type
+      case CTK_CONF_WIDGETUP_KEY:
+      ^~~~
+./../../core/ctk/ctk.c: In function ‘textentry_input’:
+./../../core/ctk/ctk.c:1204:14: warning: statement will never be executed [-Wswitch-unreachable]
+     if(txpos > 0) {
+        ~~~~~~^~~
+  CC        ./../../core/net/llsec/nullsec.c
+  CC        ./../../core/net/llsec/anti-replay.c
+  CC        ./../../core/net/llsec/ccm-star-packetbuf.c
+  CC        symbols.c
+  AR        contiki-native.a
+  CC        cetic-6lbr.c
+  CC        ./platform/native/native-init.c
+  CC        ./platform/native/native-nvm.c
+  CC        ./platform/native/native-config.c
+  CC        ./platform/native/raw-tap-eth-drv.c
+  CC        ./platform/native/raw-tap-dev.c
+  CC        ./platform/native/native-rdc.c
+  CC        ./platform/native/slip-cmds.c
+In file included from ./platform/native/slip-cmds.c:52:0:
+./platform/native/slip-cmds.c: In function ‘process_thread_border_router_cmd_process’:
+./platform/native/slip-cmds.c:113:21: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘size_t {aka unsigned int}’ [-Wformat=]
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+                     ^
+              (char *)data, strlen((char *)data));
+                            ~~~~~~~~~~~~~~~~~~~~
+./6lbr/log-6lbr.h:122:10: note: in definition of macro ‘_LOG6LBR_LEVEL_F’
+     func(__VA_ARGS__); \
+          ^~~~~~~~~~~
+./6lbr/log-6lbr.h:303:28: note: in expansion of macro ‘LOG6LBR_PRINTF’
+ #define LOG6LBR_TRACE(...) LOG6LBR_PRINTF(TRACE, GLOBAL, __VA_ARGS__)
+                            ^~~~~~~~~~~~~~
+./platform/native/slip-cmds.c:113:7: note: in expansion of macro ‘LOG6LBR_TRACE’
+       LOG6LBR_TRACE("Got serial data!!! %s of len: %lu\n",
+       ^~~~~~~~~~~~~
+  CC        ./platform/native/slip-config.c
+  CC        ./platform/native/slip-dev.c
+  CC        ./platform/native/6lbr-watchdog.c
+  CC        ./platform/native/plugin.c
+  CC        ./platform/native/lost-symbols.c
+  CC        ./6lbr/log-6lbr.c
+  CC        ./6lbr/rio.c
+  CC        ./6lbr/packet-filter.c
+  CC        ./6lbr/sicslow-ethernet.c
+  CC        ./6lbr/nvm-config.c
+  CC        ./6lbr/llsec-wrapper.c
+  CC        ./6lbr/mac-wrapper.c
+  CC        ./6lbr/ip64-eth-driver.c
+  LD        cetic-6lbr.native
+rm obj_native/plugin.o obj_native/slip-dev.o obj_native/native-config.o obj_native/llsec-wrapper.o obj_native/native-rdc.o obj_native/raw-tap-dev.o obj_native/lost-symbols.o obj_native/slip-config.o obj_native/sicslow-ethernet.o obj_native/raw-tap-eth-drv.o obj_native/native-nvm.o obj_native/slip-cmds.o obj_native/log-6lbr.o obj_native/native-init.o obj_native/nvm-config.o obj_native/ip64-eth-driver.o obj_native/6lbr-watchdog.o cetic-6lbr.co obj_native/rio.o obj_native/mac-wrapper.o obj_native/packet-filter.o
+make[4]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+mkdir -p bin
+mv cetic-6lbr.native bin/cetic_6lbr_rpl_root
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make[2]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make plugins
+make[2]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make -C plugins/dummy
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/dummy'
+fatal: not a git repository: '../../../../.git'
+fatal: not a git repository: '../../../../.git'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/dummy'
+make -C plugins/lwm2m-client
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/lwm2m-client'
+fatal: not a git repository: '../../../../.git'
+fatal: not a git repository: '../../../../.git'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/lwm2m-client'
+make[2]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make tools
+make[2]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+cd tools && make
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/tools'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/tools'
+make[2]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make[1]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+   dh_auto_test
+dh_auto_test: Compatibility levels before 9 are deprecated (level 8 in use)
+	make -j1 test
+make[1]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+make[1]: Nothing to be done for 'test'.
+make[1]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+ fakeroot debian/rules binary
+dh binary 
+dh: Compatibility levels before 9 are deprecated (level 8 in use)
+   dh_testroot
+   dh_prep
+	rm -f -- debian/cetic-6lbr.substvars
+	rm -fr -- debian/.debhelper/generated/cetic-6lbr/ debian/cetic-6lbr/ debian/tmp/
+   debian/rules override_dh_auto_install
+make[1]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+dh_auto_install -- plugins-install
+dh_auto_install: Compatibility levels before 9 are deprecated (level 8 in use)
+	install -d debian/cetic-6lbr
+	make -j1 install DESTDIR=/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr AM_UPDATE_INFO_DIR=no plugins-install
+make[2]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+fatal: not a git repository: './../../.git'
+fatal: not a git repository: './../../.git'
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/etc/6lbr
+cp -r package/etc/6lbr /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/etc
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/etc/init.d
+install package/etc/init.d/* /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/etc/init.d
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/bin
+install package/usr/bin/* /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/bin
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr
+cp -r package/usr/lib/6lbr /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/bin
+install bin/* /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/bin
+install tools/nvm_tool /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/bin
+for plugin in plugins/dummy plugins/lwm2m-client; do make -C $plugin install; done
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/dummy'
+fatal: not a git repository: '../../../../.git'
+fatal: not a git repository: '../../../../.git'
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/plugins
+install dummy.so /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/plugins
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/dummy'
+make[3]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/lwm2m-client'
+fatal: not a git repository: '../../../../.git'
+fatal: not a git repository: '../../../../.git'
+install -d /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/plugins
+install lwm2m.so /home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/debian/cetic-6lbr/usr/lib/6lbr/plugins
+make[3]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr/plugins/lwm2m-client'
+make[2]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+make[1]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+   dh_installdocs
+dh_installdocs: Compatibility levels before 9 are deprecated (level 8 in use)
+	install -d debian/cetic-6lbr/usr/share/doc/cetic-6lbr
+	install -d debian/.debhelper/generated/cetic-6lbr
+	install -p -m0644 debian/copyright debian/cetic-6lbr/usr/share/doc/cetic-6lbr/copyright
+   dh_installchangelogs
+	install -p -m0644 debian/changelog debian/cetic-6lbr/usr/share/doc/cetic-6lbr/changelog
+   debian/rules override_dh_installinit
+make[1]: Entering directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+dh_installinit --onlyscripts --name 6lbr
+dh_installinit: Compatibility levels before 9 are deprecated (level 8 in use)
+	[META] Append autosnippet "postinst-init" to postinst [debian/.debhelper/generated/cetic-6lbr/postinst.service]
+	[META] Append autosnippet "prerm-init" to prerm [debian/.debhelper/generated/cetic-6lbr/prerm.service]
+	[META] Append autosnippet "postrm-init" to postrm [debian/.debhelper/generated/cetic-6lbr/postrm.service]
+make[1]: Leaving directory '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+   dh_perl
+   dh_link
+   dh_strip_nondeterminism
+   dh_compress
+dh_compress: Compatibility levels before 9 are deprecated (level 8 in use)
+	cd debian/cetic-6lbr
+	chmod a-x usr/share/doc/cetic-6lbr/changelog
+	gzip -9nf usr/share/doc/cetic-6lbr/changelog
+	cd '/home/orangepi/6lbr-6lbr-1.4.0/examples/6lbr'
+   dh_fixperms
+	find debian/cetic-6lbr -true -print0 2>/dev/null | xargs -0r chown --no-dereference 0:0
+	find debian/cetic-6lbr ! -type l -a -true -a -true -print0 2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s
+	find debian/cetic-6lbr/usr/share/doc -type f -a -true -a ! -regex 'debian/cetic-6lbr/usr/share/doc/[^/]*/examples/.*' -print0 2>/dev/null | xargs -0r chmod 0644
+	find debian/cetic-6lbr/usr/share/doc -type d -a -true -a -true -print0 2>/dev/null | xargs -0r chmod 0755
+	find debian/cetic-6lbr -type f \( -name '*.so.*' -o -name '*.so' -o -name '*.la' -o -name '*.a' -o -name '*.js' -o -name '*.css' -o -name '*.scss' -o -name '*.sass' -o -name '*.jpeg' -o -name '*.jpg' -o -name '*.png' -o -name '*.gif' -o -name '*.cmxs' \) -a -true -a -true -print0 2>/dev/null | xargs -0r chmod 0644
+	find debian/cetic-6lbr/usr/bin debian/cetic-6lbr/etc/init.d -type f -a -true -a -true -print0 2>/dev/null | xargs -0r chmod a+x
+	find debian/cetic-6lbr/usr/lib -type f -name '*.ali' -a -true -a -true -print0 2>/dev/null | xargs -0r chmod uga-w
+   dh_missing
+dh_missing: Compatibility levels before 9 are deprecated (level 8 in use)
+   dh_strip
+dh_strip: Compatibility levels before 9 are deprecated (level 8 in use)
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/8e
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/plugins/lwm2m.so debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/8e/6fd0645c4441a2e0b27b269aa5ed8cffb7075c.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/8e/6fd0645c4441a2e0b27b269aa5ed8cffb7075c.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/8e/6fd0645c4441a2e0b27b269aa5ed8cffb7075c.debug
+	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/cetic-6lbr/usr/lib/6lbr/plugins/lwm2m.so
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/8e/6fd0645c4441a2e0b27b269aa5ed8cffb7075c.debug debian/cetic-6lbr/usr/lib/6lbr/plugins/lwm2m.so
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/plugins/dummy.so debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18/1a907911843a46cfcb14024e76c81464f1bfb4.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18/1a907911843a46cfcb14024e76c81464f1bfb4.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18/1a907911843a46cfcb14024e76c81464f1bfb4.debug
+	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/cetic-6lbr/usr/lib/6lbr/plugins/dummy.so
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18/1a907911843a46cfcb14024e76c81464f1bfb4.debug debian/cetic-6lbr/usr/lib/6lbr/plugins/dummy.so
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug
+	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/share/doc
+	ln -s cetic-6lbr debian/.debhelper/cetic-6lbr/dbgsym-root/usr/share/doc/cetic-6lbr-dbgsym
+   dh_makeshlibs
+	rm -f debian/cetic-6lbr/DEBIAN/shlibs
+dh_makeshlibs: Compatibility levels before 9 are deprecated (level 8 in use)
+   dh_shlibdeps
+dh_shlibdeps: Compatibility levels before 9 are deprecated (level 8 in use)
+	install -d debian/cetic-6lbr/DEBIAN
+	dpkg-shlibdeps -Tdebian/cetic-6lbr.substvars debian/cetic-6lbr/usr/lib/6lbr/plugins/lwm2m.so debian/cetic-6lbr/usr/lib/6lbr/plugins/dummy.so debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router
+   dh_installdeb
+dh_installdeb: Compatibility levels before 9 are deprecated (level 8 in use)
+	printf '#!/bin/sh\nset -e\n' > debian/cetic-6lbr/DEBIAN/postinst
+	cat debian/.debhelper/generated/cetic-6lbr/postinst.service >> debian/cetic-6lbr/DEBIAN/postinst
+	chmod 0755 -- debian/cetic-6lbr/DEBIAN/postinst
+	chown 0:0 -- debian/cetic-6lbr/DEBIAN/postinst
+	printf '#!/bin/sh\nset -e\n' > debian/cetic-6lbr/DEBIAN/prerm
+	cat debian/.debhelper/generated/cetic-6lbr/prerm.service >> debian/cetic-6lbr/DEBIAN/prerm
+	chmod 0755 -- debian/cetic-6lbr/DEBIAN/prerm
+	chown 0:0 -- debian/cetic-6lbr/DEBIAN/prerm
+	printf '#!/bin/sh\nset -e\n' > debian/cetic-6lbr/DEBIAN/postrm
+	cat debian/.debhelper/generated/cetic-6lbr/postrm.service >> debian/cetic-6lbr/DEBIAN/postrm
+	chmod 0755 -- debian/cetic-6lbr/DEBIAN/postrm
+	chown 0:0 -- debian/cetic-6lbr/DEBIAN/postrm
+	find debian/cetic-6lbr/etc -type f -printf '/etc/%P
+' | LC_ALL=C sort >> debian/cetic-6lbr/DEBIAN/conffiles
+	chmod 0644 -- debian/cetic-6lbr/DEBIAN/conffiles
+	chown 0:0 -- debian/cetic-6lbr/DEBIAN/conffiles
+   dh_gencontrol
+	echo misc:Depends= >> debian/cetic-6lbr.substvars
+	echo misc:Pre-Depends= >> debian/cetic-6lbr.substvars
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN
+	dpkg-gencontrol -pcetic-6lbr -ldebian/changelog -Tdebian/cetic-6lbr.substvars -Pdebian/.debhelper/cetic-6lbr/dbgsym-root -UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential -UConflicts -DPriority=optional -UHomepage -UImportant -DAuto-Built-Package=debug-symbols -DPackage=cetic-6lbr-dbgsym "-DDepends=cetic-6lbr (= \${binary:Version})" "-DDescription=debug symbols for cetic-6lbr" "-DBuild-Ids=067e7f38895dd08f66de7576299f568e44ae271e 181a907911843a46cfcb14024e76c81464f1bfb4 2b18674561141f08f56b3e8c87faeb5353627d77 7084f2822a2b94924913cb88c77596d73d8cfa29 71501fe646a46bc78f247a84a4b4783e7078162c 77f32b2b7f71e1d0c3df4535752f4e6c196fdb61 8e6fd0645c4441a2e0b27b269aa5ed8cffb7075c a6c356a7acfbd95e5624578e72bf3028c64011d2 d2ce810f0e2d8646029e6ce06ab26607c58506cc fa19c5333a6d9e636270313af1d80f98da127399" -DSection=debug -DPackage-Type=ddeb -UMulti-Arch -UReplaces -UBreaks
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN/control
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN/control
+	dpkg-gencontrol -pcetic-6lbr -ldebian/changelog -Tdebian/cetic-6lbr.substvars -Pdebian/cetic-6lbr -UMulti-Arch
+	chmod 0644 -- debian/cetic-6lbr/DEBIAN/control
+	chown 0:0 -- debian/cetic-6lbr/DEBIAN/control
+   dh_md5sums
+	(cd debian/cetic-6lbr >/dev/null ; find . -type f ! -path "./etc/6lbr/6lbr.conf.beaglebone" ! -path "./etc/6lbr/6lbr.conf.example" ! -path "./etc/6lbr/6lbr.conf.nooliberry" ! -path "./etc/6lbr/6lbr.conf.openwrt" ! -path "./etc/6lbr/6lbr.conf.rpi" ! -path "./etc/6lbr/ifdown.d/20bridge" ! -path "./etc/6lbr/ifdown.d/50link" ! -path "./etc/6lbr/ifdown.d/70routes" ! -path "./etc/6lbr/ifscript.example" ! -path "./etc/6lbr/ifup.d/20link" ! -path "./etc/6lbr/ifup.d/50bridge" ! -path "./etc/6lbr/ifup.d/55bridge_multicast" ! -path "./etc/6lbr/ifup.d/80itf_autoconf" ! -path "./etc/6lbr/ifup.d/99dump" ! -path "./etc/6lbr/interfaces.beaglebone.example" ! -path "./etc/6lbr/interfaces.dhcp.example" ! -path "./etc/6lbr/interfaces.static.example" ! -path "./etc/init.d/6lbr"  ! -regex './DEBIAN/.*' -printf '%P\0' | LC_ALL=C sort -z | xargs -r0 md5sum | perl -pe 'if (s@^\\@@) { s/\\\\/\\/g; }' > DEBIAN/md5sums) >/dev/null
+	chmod 0644 -- debian/cetic-6lbr/DEBIAN/md5sums
+	chown 0:0 -- debian/cetic-6lbr/DEBIAN/md5sums
+	(cd debian/.debhelper/cetic-6lbr/dbgsym-root >/dev/null ; find . -type f ! -regex './DEBIAN/.*' -printf '%P\0' | LC_ALL=C sort -z | xargs -r0 md5sum | perl -pe 'if (s@^\\@@) { s/\\\\/\\/g; }' > DEBIAN/md5sums) >/dev/null
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN/md5sums
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN/md5sums
+   dh_builddeb
+	dpkg-deb --build debian/cetic-6lbr ..
+dpkg-deb: building package 'cetic-6lbr' in '../cetic-6lbr_1.4.O_armhf.deb'.
+	install -d debian/.debhelper/scratch-space/build-cetic-6lbr
+	dpkg-deb --build debian/.debhelper/cetic-6lbr/dbgsym-root debian/.debhelper/scratch-space/build-cetic-6lbr
+dpkg-deb: building package 'cetic-6lbr-dbgsym' in 'debian/.debhelper/scratch-space/build-cetic-6lbr/cetic-6lbr-dbgsym_1.4.O_armhf.deb'.
+	Renaming cetic-6lbr-dbgsym_1.4.O_armhf.deb to cetic-6lbr-dbgsym_1.4.O_armhf.ddeb
+	mv debian/.debhelper/scratch-space/build-cetic-6lbr/cetic-6lbr-dbgsym_1.4.O_armhf.deb ../cetic-6lbr-dbgsym_1.4.O_armhf.ddeb
+ dpkg-genbuildinfo
+ dpkg-genchanges  >../cetic-6lbr_1.4.O_armhf.changes
+dpkg-genchanges: info: including full source code in upload
+ dpkg-source --after-build 6lbr
+dpkg-buildpackage: info: full upload; Debian-native package (full source is included)

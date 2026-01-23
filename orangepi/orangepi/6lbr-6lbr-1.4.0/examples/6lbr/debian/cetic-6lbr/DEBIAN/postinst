@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+# Automatically added by dh_installinit/11.1.6ubuntu2
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -x "/etc/init.d/6lbr" ]; then
+		update-rc.d 6lbr defaults >/dev/null
+		invoke-rc.d 6lbr start || exit 1
+	fi
+fi
+# End automatically added section

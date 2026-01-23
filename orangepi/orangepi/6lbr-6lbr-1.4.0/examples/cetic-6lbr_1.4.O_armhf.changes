@@ -1,0 +1,85 @@
+Format: 1.8
+Date: Thu, 12 May 2016 16:32:25 +0200
+Source: cetic-6lbr
+Binary: cetic-6lbr
+Architecture: source armhf
+Version: 1.4.O
+Distribution: unstable
+Urgency: low
+Maintainer: 6LBR Team <6lbr@cetic.be>
+Changed-By: 6lbr-team <6lbr@cetic.be>
+Description:
+ cetic-6lbr - CETIC 6LoWPAN Border Router
+Changes:
+ cetic-6lbr (1.4.O) unstable; urgency=low
+ .
+   * Features
+     Link layer Security
+     NAT 64 / Dual stack
+     RDNSS
+     DNS Forwarder
+     mDNS advertising
+     Static port mapping
+     Node Info (PRR, Hop Count, Parent Switch, ...)
+   * Platform
+     Zolertia Zoul/RE-Mote
+     OpenMote
+     CC26xx (experimental)
+     OpenWRT
+   * Network
+     6lowpan context configuration (limited)
+     RPL stability bugfixes
+     Static route support
+     Tap/bridge interface autoconfiguration
+     RFC 4193 configuration script
+   * Updates
+     Rebased on Contiki 3.0
+     TinyDTLS 1.9
+     RFC CoAP
+   * Development
+     User plugins
+     Out of tree development
+     Modular webserver
+     New configuration file
+   * 6lbr-demo
+     Simple Core Interface library
+     CC26xx support
+   * Simple Core Interface library ([draft-ietf-core-interfaces](https://tools.ietf.org/html/draft-ietf-core-interfaces-03))
+     Observe binding support
+     CoAP push binding support
+     Runtime configurable binding
+     Text, JSON, XML and SenML encoding
+     Linked list, batch and linked batch support
+     Simple Resource Directory client
+     IPSO Application Framework demo
+     LWM2M demo
+   * Bugfixes
+     Slip-Radio throughput improvements
+     Fix CRC when Adress overriding is enabled
+     CC2538DK alignment issues solved
+     Loss of connectivity in SmartBridge mode
+     Big Endian platform support
+     Multi-dodag bugfixes
+     Fix CSMA infinite retransmissions
+     Various webserver glitches fixed
+     Wrong month in logs fixed
+     LLSEC reboot workaround
+     Global DODAG id correction
+Checksums-Sha1:
+ 666fc556a79c90b27927c353db3c0a7dab682515 559 cetic-6lbr_1.4.O.dsc
+ 78abbf369fe530bc7efa62b6320f2f6b0e2d7912 1682896 cetic-6lbr_1.4.O.tar.xz
+ b28f79f9957a570e926f86d68fb9c3765c61eb0d 4250908 cetic-6lbr-dbgsym_1.4.O_armhf.ddeb
+ c58d1521bfd33f94473e3c6d4b27aa7844b96e07 5578 cetic-6lbr_1.4.O_armhf.buildinfo
+ f75418424b3a3aa7315572bdd680ed7a36e68007 330892 cetic-6lbr_1.4.O_armhf.deb
+Checksums-Sha256:
+ bab3dbc137780c0a11727f765490e866b0051dd7a043dab794d6e58bf1dc99a6 559 cetic-6lbr_1.4.O.dsc
+ ae0cc351ff5dea9e6dc4b15642ee818cab0514b1f74792d03d1c6b6156b8fb84 1682896 cetic-6lbr_1.4.O.tar.xz
+ fac5b08825f5ff63d10786ed3973e0b2383ad301c92ed038870089a779f13675 4250908 cetic-6lbr-dbgsym_1.4.O_armhf.ddeb
+ d5fbe509fea307b01a0526b06bdd2d1cb8441815587d416ee64562be22170ca6 5578 cetic-6lbr_1.4.O_armhf.buildinfo
+ cc2970109037fb0f737d36e39fe9bbcf14c0168b7d58ce037b279d4458cb2f9c 330892 cetic-6lbr_1.4.O_armhf.deb
+Files:
+ 8aee9f6044a1565d459fe7a90448ee90 559 net extra cetic-6lbr_1.4.O.dsc
+ e4e5117a395f81aceb946f2280a16c80 1682896 net extra cetic-6lbr_1.4.O.tar.xz
+ f0ee9f88f8d1202f9af2bafd48713361 4250908 debug optional cetic-6lbr-dbgsym_1.4.O_armhf.ddeb
+ 026d3af0ceba108f5f2a0c0ada13c165 5578 net extra cetic-6lbr_1.4.O_armhf.buildinfo
+ 1d40e48ba9c31f81c5ef97566098b005 330892 net extra cetic-6lbr_1.4.O_armhf.deb

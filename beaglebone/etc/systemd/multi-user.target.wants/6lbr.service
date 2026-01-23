@@ -1,0 +1,31 @@
+[Unit]
+Description=6LoWPAN Border Router
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/6lbr/bin/cetic_6lbr_router \
+  -c /etc/6lbr/nvm.dat \
+  -s /dev/ttyUSB1 \
+  -t tap0 \
+  -R \
+  -B 115200 \
+  -U /usr/lib/6lbr/6lbr-ifup \
+  -D /usr/lib/6lbr/6lbr-ifdown \
+  -w /usr/lib/6lbr/www \
+  -L 3 \
+  -W /var/log/6lbr.timestamp \
+  -P 60 \
+  -C /var/log/6lbr.ip \
+  -m /usr/lib/6lbr/plugins
+
+Restart=on-failure
+KillMode=control-group
+TimeoutStopSec=5
+StandardOutput=append:/var/log/6lbr.log
+StandardError=append:/var/log/6lbr.err
+
+[Install]
+WantedBy=multi-user.target
+
