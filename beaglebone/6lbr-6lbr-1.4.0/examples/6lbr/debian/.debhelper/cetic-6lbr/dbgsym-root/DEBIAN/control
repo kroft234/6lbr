@@ -1,0 +1,12 @@
+Package: cetic-6lbr-dbgsym
+Source: cetic-6lbr
+Version: 1.4.O
+Auto-Built-Package: debug-symbols
+Architecture: armhf
+Maintainer: 6LBR Team <6lbr@cetic.be>
+Installed-Size: 3422
+Depends: cetic-6lbr (= 1.4.O)
+Section: debug
+Priority: optional
+Description: debug symbols for cetic-6lbr
+Build-Ids: 067e7f38895dd08f66de7576299f568e44ae271e 17dbc0b49f9bbe16a015a32fdbff5e1ccf0ccc65 181a907911843a46cfcb14024e76c81464f1bfb4 23f945e6008f5d9cfbea46f20ad28b39887b7c2b 270715c56e2fcec94b88ccc721b3d17e1dc041f0 32e1141c8241baa4d769a9a7c6be54c0962c9620 6e9ede021861ecc64a8eb51bf8eca9d7ffce5e91 8e6fd0645c4441a2e0b27b269aa5ed8cffb7075c f1e049b652278f1808528f1abece6722f900aefb fb1641db1b8312b9203fe52f6bef645709f42b05

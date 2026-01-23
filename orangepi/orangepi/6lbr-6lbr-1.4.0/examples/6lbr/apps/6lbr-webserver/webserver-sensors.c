@@ -448,6 +448,15 @@ PT_THREAD(generate_sensors_hop_count(struct httpd_state *s))
   PSOCK_END(&s->sout);
 }
 
+static httpd_cgi_call_t *
+webserver_sensors_reset_stats_all(struct httpd_state *s)
+{
+  node_info_reset_statistics_all();
+  webserver_result_title = "Sensors";
+  webserver_result_text = "All statistics reset";
+  return &webserver_result_page;
+}
+
 static
 PT_THREAD(generate_nodeweb(struct httpd_state *s))
 {
@@ -457,34 +466,31 @@ PT_THREAD(generate_nodeweb(struct httpd_state *s))
 
   if(s->query && strncmp(s->query, "ip=", 3) == 0) {
 
-    strncpy(ipstr, s->query + 3, sizeof(ipstr));
+    strncpy(ipstr, s->query + 3, sizeof(ipstr) - 1);
     ipstr[sizeof(ipstr) - 1] = 0;
 
-    /* ====== Redirect to client ====== */
-    add("HTTP/1.0 302 Found\r\n");
-    add("Location: http://[%s]/\r\n", ipstr);
-    add("Content-Length: 0\r\n");
-    add("\r\n");
-
-    SEND_STRING(&s->sout, buf);
-    reset_buf();
+    SEND_STRING(&s->sout,
+      "HTTP/1.0 302 Found\r\n"
+      "Location: http://[");
+    SEND_STRING(&s->sout, ipstr);
+    SEND_STRING(&s->sout,
+      "]/\r\n"
+      "Content-Length: 0\r\n"
+      "Connection: close\r\n"
+      "\r\n"
+    );
 
   } else {
-    add("Missing ip parameter");
-    SEND_STRING(&s->sout, buf);
-    reset_buf();
+    SEND_STRING(&s->sout,
+      "HTTP/1.0 400 Bad Request\r\n"
+      "Content-Type: text/plain\r\n"
+      "Connection: close\r\n"
+      "\r\n"
+      "Missing ip parameter"
+    );
   }
 
   PSOCK_END(&s->sout);
-}
-
-static httpd_cgi_call_t *
-webserver_sensors_reset_stats_all(struct httpd_state *s)
-{
-  node_info_reset_statistics_all();
-  webserver_result_title = "Sensors";
-  webserver_result_text = "All statistics reset";
-  return &webserver_result_page;
 }
 
 HTTPD_CGI_CALL(webserver_sensors_info, "sensors.html", "Sensors", generate_sensors_info, 0);
@@ -495,5 +501,12 @@ HTTPD_CGI_CALL(webserver_sensors_tree, "sensors_tree.html", "Node tree", generat
 HTTPD_CGI_CALL(webserver_sensors_prr, "sensors_prr.html", "PRR", generate_sensors_prr, 0);
 HTTPD_CGI_CALL(webserver_sensors_ps, "sensors_ps.html", "Parent switch", generate_sensors_parent_switch, 0);
 HTTPD_CGI_CALL(webserver_sensors_hc, "sensors_hc.html", "Hop count", generate_sensors_hop_count, 0);
-HTTPD_CGI_CALL(webserver_nodeweb,"nodeweb","Node web",generate_nodeweb,WEBSERVER_NOMENU);
+HTTPD_CGI_CALL(
+  webserver_nodeweb,
+  "nodeweb",
+  "Node web",
+  generate_nodeweb,
+  HTTPD_CUSTOM_HEADER | HTTPD_CUSTOM_TOP | HTTPD_CUSTOM_BOTTOM | WEBSERVER_NOMENU
+);
+
 HTTPD_CGI_CMD(webserver_sensors_reset_stats_all_cmd, "reset-stats-all", webserver_sensors_reset_stats_all, 0);

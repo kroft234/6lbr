@@ -2295,54 +2295,54 @@ dh_strip: Compatibility levels before 9 are deprecated (level 8 in use)
 	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18/1a907911843a46cfcb14024e76c81464f1bfb4.debug
 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/cetic-6lbr/usr/lib/6lbr/plugins/dummy.so
 	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/18/1a907911843a46cfcb14024e76c81464f1bfb4.debug debian/cetic-6lbr/usr/lib/6lbr/plugins/dummy.so
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/bd
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/bd/23f90d0266ac1089f90e96e1dac6671cfcdb20.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/bd/23f90d0266ac1089f90e96e1dac6671cfcdb20.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/bd/23f90d0266ac1089f90e96e1dac6671cfcdb20.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/fa/19c5333a6d9e636270313af1d80f98da127399.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/bd/23f90d0266ac1089f90e96e1dac6671cfcdb20.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_relay
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/cb
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/cb/3d8f8ac2f666dc79f2c2f203903f2ed7c9abb1.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/cb/3d8f8ac2f666dc79f2c2f203903f2ed7c9abb1.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/cb/3d8f8ac2f666dc79f2c2f203903f2ed7c9abb1.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/71/501fe646a46bc78f247a84a4b4783e7078162c.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/cb/3d8f8ac2f666dc79f2c2f203903f2ed7c9abb1.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_rpl_root
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/95
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/95/ef66638b1876f39114e94a0f9801b9f256f245.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/95/ef66638b1876f39114e94a0f9801b9f256f245.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/95/ef66638b1876f39114e94a0f9801b9f256f245.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/70/84f2822a2b94924913cb88c77596d73d8cfa29.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/95/ef66638b1876f39114e94a0f9801b9f256f245.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_6lr
 	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06
 	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug
 	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug
 	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool
 	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/06/7e7f38895dd08f66de7576299f568e44ae271e.debug debian/cetic-6lbr/usr/lib/6lbr/bin/nvm_tool
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/68
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/68/467c0312011f34bb5617a3975828ef8a464243.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/68/467c0312011f34bb5617a3975828ef8a464243.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/68/467c0312011f34bb5617a3975828ef8a464243.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/77/f32b2b7f71e1d0c3df4535752f4e6c196fdb61.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/68/467c0312011f34bb5617a3975828ef8a464243.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_smart_bridge
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/c8
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/c8/d367cb95a216d8bbcc2b3eb13933245fee65ef.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/c8/d367cb95a216d8bbcc2b3eb13933245fee65ef.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/c8/d367cb95a216d8bbcc2b3eb13933245fee65ef.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/d2/ce810f0e2d8646029e6ce06ab26607c58506cc.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/c8/d367cb95a216d8bbcc2b3eb13933245fee65ef.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_ndp_router
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/11
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/11/997c0877bb6434b2d88d437d850106a9ab9327.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/11/997c0877bb6434b2d88d437d850106a9ab9327.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/11/997c0877bb6434b2d88d437d850106a9ab9327.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/a6/c356a7acfbd95e5624578e72bf3028c64011d2.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge
-	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b
-	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug
-	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug
-	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/11/997c0877bb6434b2d88d437d850106a9ab9327.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_full_transparent_bridge
+	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/4b
+	objcopy --only-keep-debug --compress-debug-sections debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/4b/7a8b64e7212edc8d7c5acbfe55808ec4ece042.debug
+	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/4b/7a8b64e7212edc8d7c5acbfe55808ec4ece042.debug
+	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/4b/7a8b64e7212edc8d7c5acbfe55808ec4ece042.debug
 	strip --remove-section=.comment --remove-section=.note debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router
-	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/2b/18674561141f08f56b3e8c87faeb5353627d77.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router
+	objcopy --add-gnu-debuglink debian/.debhelper/cetic-6lbr/dbgsym-root/usr/lib/debug/.build-id/4b/7a8b64e7212edc8d7c5acbfe55808ec4ece042.debug debian/cetic-6lbr/usr/lib/6lbr/bin/cetic_6lbr_router
 	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/usr/share/doc
 	ln -s cetic-6lbr debian/.debhelper/cetic-6lbr/dbgsym-root/usr/share/doc/cetic-6lbr-dbgsym
    dh_makeshlibs
@@ -2374,7 +2374,7 @@ dh_installdeb: Compatibility levels before 9 are deprecated (level 8 in use)
 	echo misc:Depends= >> debian/cetic-6lbr.substvars
 	echo misc:Pre-Depends= >> debian/cetic-6lbr.substvars
 	install -d debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN
-	dpkg-gencontrol -pcetic-6lbr -ldebian/changelog -Tdebian/cetic-6lbr.substvars -Pdebian/.debhelper/cetic-6lbr/dbgsym-root -UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential -UConflicts -DPriority=optional -UHomepage -UImportant -DAuto-Built-Package=debug-symbols -DPackage=cetic-6lbr-dbgsym "-DDepends=cetic-6lbr (= \${binary:Version})" "-DDescription=debug symbols for cetic-6lbr" "-DBuild-Ids=067e7f38895dd08f66de7576299f568e44ae271e 181a907911843a46cfcb14024e76c81464f1bfb4 2b18674561141f08f56b3e8c87faeb5353627d77 7084f2822a2b94924913cb88c77596d73d8cfa29 71501fe646a46bc78f247a84a4b4783e7078162c 77f32b2b7f71e1d0c3df4535752f4e6c196fdb61 8e6fd0645c4441a2e0b27b269aa5ed8cffb7075c a6c356a7acfbd95e5624578e72bf3028c64011d2 d2ce810f0e2d8646029e6ce06ab26607c58506cc fa19c5333a6d9e636270313af1d80f98da127399" -DSection=debug -DPackage-Type=ddeb -UMulti-Arch -UReplaces -UBreaks
+	dpkg-gencontrol -pcetic-6lbr -ldebian/changelog -Tdebian/cetic-6lbr.substvars -Pdebian/.debhelper/cetic-6lbr/dbgsym-root -UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential -UConflicts -DPriority=optional -UHomepage -UImportant -DAuto-Built-Package=debug-symbols -DPackage=cetic-6lbr-dbgsym "-DDepends=cetic-6lbr (= \${binary:Version})" "-DDescription=debug symbols for cetic-6lbr" "-DBuild-Ids=067e7f38895dd08f66de7576299f568e44ae271e 11997c0877bb6434b2d88d437d850106a9ab9327 181a907911843a46cfcb14024e76c81464f1bfb4 4b7a8b64e7212edc8d7c5acbfe55808ec4ece042 68467c0312011f34bb5617a3975828ef8a464243 8e6fd0645c4441a2e0b27b269aa5ed8cffb7075c 95ef66638b1876f39114e94a0f9801b9f256f245 bd23f90d0266ac1089f90e96e1dac6671cfcdb20 c8d367cb95a216d8bbcc2b3eb13933245fee65ef cb3d8f8ac2f666dc79f2c2f203903f2ed7c9abb1" -DSection=debug -DPackage-Type=ddeb -UMulti-Arch -UReplaces -UBreaks
 	chmod 0644 -- debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN/control
 	chown 0:0 -- debian/.debhelper/cetic-6lbr/dbgsym-root/DEBIAN/control
 	dpkg-gencontrol -pcetic-6lbr -ldebian/changelog -Tdebian/cetic-6lbr.substvars -Pdebian/cetic-6lbr -UMulti-Arch
