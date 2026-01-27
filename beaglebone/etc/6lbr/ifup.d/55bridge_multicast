@@ -17,10 +17,15 @@ fi
 
 case $OS in
 	Linux)
-		ip link set $DEV down
+			if [ "$BRIDGE_DISABLE_SNOOPING" = "1" -a -e /sys/devices/virtual/net/$DEV_BRIDGE/bridge/multicast_snooping ]; then
+				echo 0 > /sys/devices/virtual/net/$DEV_BRIDGE/bridge/multicast_snooping
+			fi
 		;;
+
 	Darwin)
 		;;
+
 	*)
 		echo Unknown OS
+		;;
 esac
