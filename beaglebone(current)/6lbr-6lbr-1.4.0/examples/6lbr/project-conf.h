@@ -96,6 +96,9 @@
 // Always use infinite upward route
 #define RPL_CONF_DEFAULT_ROUTE_INFINITE_LIFETIME    1
 
+/* RPL: client-only mode (never become DODAG root) */
+#define RPL_CONF_CLIENT_ONLY 1
+
 // Ethernet header is stored in uip_buf
 #undef UIP_CONF_LLH_LEN
 #define UIP_CONF_LLH_LEN 14
@@ -172,8 +175,14 @@
 /* ROUTER MODE                                                      */
 /*------------------------------------------------------------------*/
 
+#if RPL_CONF_CLIENT_ONLY
 #undef UIP_CONF_ND6_SEND_RA
-#define UIP_CONF_ND6_SEND_RA		1
+#define UIP_CONF_ND6_SEND_RA 0
+#warning "UIP_CONF_ND6_SEND_RA 0 (Client-only mode)"
+#else
+#undef UIP_CONF_ND6_SEND_RA
+#define UIP_CONF_ND6_SEND_RA 1
+#endif
 
 #undef UIP_CONF_ND6_DEF_MAXDADNS
 #define UIP_CONF_ND6_DEF_MAXDADNS	1
@@ -194,19 +203,35 @@
 #undef UIP_CONF_ROUTER
 #define UIP_CONF_ROUTER             1
 
-#define CETIC_6LBR_DODAG_ROOT		1
-
-#if CETIC_6LBR_ONE_ITF
-#define CETIC_6LBR_ETH_FILTER_RPL	0
+#if RPL_CONF_CLIENT_ONLY
+#warning "6LBR running as CLIENT-ONLY ROUTER (no DODAG root)"
 #else
-#define CETIC_6LBR_ETH_FILTER_RPL	1
+#warning "6LBR running as ROUTER + DODAG ROOT"
 #endif
 
-#if UIP_CONF_IPV6_RPL
-#define CETIC_6LBR_WSN_FILTER_RA	1
+#if RPL_CONF_CLIENT_ONLY
+#define CETIC_6LBR_DODAG_ROOT  0
 #else
-#define CETIC_6LBR_WSN_FILTER_RA	0
+#define CETIC_6LBR_DODAG_ROOT  1
 #endif
+
+// Фильтруем RPL трафик на Ethernet (DIO, DAO)
+#define CETIC_6LBR_ETH_FILTER_RPL 1
+
+// Фильтруем RA для WSN сегмента
+#define CETIC_6LBR_WSN_FILTER_RA 1
+
+/*#if CETIC_6LBR_ONE_ITF*/
+/*#define CETIC_6LBR_ETH_FILTER_RPL	0*/
+/*#else*/
+/*#define CETIC_6LBR_ETH_FILTER_RPL	1*/
+/*#endif*/
+
+/*#if UIP_CONF_IPV6_RPL*/
+/*#define CETIC_6LBR_WSN_FILTER_RA	1*/
+/*#else*/
+/*#define CETIC_6LBR_WSN_FILTER_RA	0*/
+/*#endif*/
 
 /*------------------------------------------------------------------*/
 #endif

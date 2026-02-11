@@ -296,6 +296,12 @@ rpl_set_root(uint8_t instance_id, uip_ipaddr_t *dag_id)
   rpl_instance_t *instance;
   uint8_t version;
   int i;
+#if RPL_CLIENT_ONLY
+  PRINTF("RPL[CLIENT_ONLY]: rpl_set_root() BLOCKED — client is not allowed to be root\n");
+  PRINT6ADDR(dag_id);
+  PRINTF("\n");
+  return NULL;
+#endif
 
 #if CETIC_6LBR
   version = nvm_data.rpl_version_id;
@@ -388,6 +394,12 @@ rpl_set_root(uint8_t instance_id, uip_ipaddr_t *dag_id)
 int
 rpl_repair_root(uint8_t instance_id)
 {
+
+#if RPL_CLIENT_ONLY
+  PRINTF("RPL[CLIENT_ONLY]: rpl_repair_root() called — ignored (not root)\n");
+  return 0;
+#endif
+
   rpl_instance_t *instance;
 
   instance = rpl_get_instance(instance_id);
@@ -919,6 +931,11 @@ rpl_get_any_dag(void)
       return instance_table[i].current_dag;
     }
   }
+
+#if RPL_CLIENT_ONLY
+  PRINTF("RPL[CLIENT_ONLY]: rpl_get_any_dag() -> NULL (no DAG, but client-only)\n");
+#endif
+
   return NULL;
 }
 /*---------------------------------------------------------------------------*/
@@ -1332,6 +1349,12 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
   }
 
   if(instance->current_dag->rank == ROOT_RANK(instance) && instance->current_dag != dag) {
+  #if RPL_CLIENT_ONLY
+	if(instance->current_dag &&
+   	instance->current_dag->rank == ROOT_RANK(instance)) {
+  	PRINTF("RPL[CLIENT_ONLY]: ERROR — node has ROOT_RANK but is client-only\n");
+	}
+   #endif
     PRINTF("RPL: Root ignored DIO for different DAG\n");
     return;
   }

@@ -35,8 +35,17 @@
 #include "net/rpl/rpl.h"
 #include "net/rpl/rpl-private.h"
 #include "net/rpl/rpl-dag-root.h"
+#include "net/rpl/rpl-conf.h"
 
 #include <string.h>
+
+/*---------------------------------------------------------------------------*/
+#ifndef LOG6LBR_MODULE
+#define LOG6LBR_MODULE "RPL"
+#endif
+
+#include "log-6lbr.h"
+/*---------------------------------------------------------------------------*/
 
 #define DEBUG DEBUG_NONE
 #include "net/ip/uip-debug.h"
@@ -81,6 +90,12 @@ get_global_address(void)
 static void
 create_dag_callback(void *ptr)
 {
+
+#if RPL_CLIENT_ONLY
+  LOG6LBR_INFO("create_dag_callback() blocked (auto-root prevented)\n");
+  return;
+#endif
+
   const uip_ipaddr_t *root, *ipaddr;
 
   root = dag_root();
@@ -126,6 +141,14 @@ static void
 route_callback(int event, uip_ipaddr_t *route, uip_ipaddr_t *ipaddr,
                int numroutes)
 {
+
+#if RPL_CLIENT_ONLY
+  if(event == UIP_DS6_NOTIFICATION_DEFRT_ADD) {
+    printf("route_callback(): default route added, root escalation blocked");
+  }
+  return;
+#endif
+
   if(event == UIP_DS6_NOTIFICATION_DEFRT_ADD) {
     if(route != NULL && ipaddr != NULL &&
        !uip_is_addr_unspecified(route) &&
@@ -166,19 +189,37 @@ set_global_address(void)
 void
 rpl_dag_root_init(void)
 {
+  LOG6LBR_INFO("rpl_dag_root_init() called\n");
   static uint8_t initialized = 0;
 
   if(!initialized) {
+    LOG6LBR_INFO("### RPL_CONF_CLIENT_ONLY=%d ###\n", RPL_CONF_CLIENT_ONLY);
     to_become_root = 0;
     set_global_address();
     uip_ds6_notification_add(&n, route_callback);
+    
+    // <-- вставляем здесь
+    rpl_dag_t *dag = rpl_get_any_dag();
+    if(dag) {
+      LOG6LBR_INFO("Joined DODAG, rank=%u\n", dag->rank);
+    } else {
+      LOG6LBR_INFO("No DODAG joined yet\n");
+    }
+
     initialized = 1;
   }
 }
+
 /*---------------------------------------------------------------------------*/
 int
 rpl_dag_root_init_dag_immediately(void)
 {
+
+#if RPL_CLIENT_ONLY
+  /* Client-only router: never become RPL root */
+  LOG6LBR_INFO("RPL: client-only router, root creation blocked\n");
+  return -1;
+#endif
   struct uip_ds6_addr *root_if;
   int i;
   uint8_t state;
@@ -230,6 +271,11 @@ rpl_dag_root_init_dag_immediately(void)
 void
 rpl_dag_root_init_dag(void)
 {
+#if RPL_CLIENT_ONLY
+  /* Client-only router: never initiate DODAG */
+  LOG6LBR_INFO("rpl_dag_root_init_dag() blocked\n");
+  return;
+#endif
   rpl_dag_root_init();
 
   ctimer_set(&c, RPL_DAG_GRACE_PERIOD, create_dag_callback, NULL);
@@ -242,6 +288,12 @@ rpl_dag_root_init_dag(void)
 int
 rpl_dag_root_is_root(void)
 {
+
+#if RPL_CLIENT_ONLY
+  LOG6LBR_INFO("rpl_dag_root_is_root() queried -> false\n");
+  return 0;
+#endif
+
   rpl_instance_t *instance;
 
   instance = rpl_get_default_instance();

@@ -15,8 +15,4 @@ sudo ip link set br0 up
 sudo ip addr add 192.168.6.38/24 dev br0
 
 # Добавляем default route
-sudo ip route add default via 192.168.6.254 dev br0
-
-# Включаем IPv6 forwarding и proxy_ndp (если нужно)
-sudo sysctl -w net.ipv6.conf.all.forwarding=1
-sudo sysctl -w net.ipv6.conf.br0.proxy_ndp=1
+sudo ip route replace default via 192.168.6.254 dev br0

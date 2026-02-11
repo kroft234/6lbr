@@ -88,6 +88,21 @@
 #endif
 
 /*
+ * Client-only router:
+ * Node can act as a router and forward packets,
+ * but is NEVER allowed to become RPL root or create a DODAG.
+ */
+#ifdef RPL_CONF_CLIENT_ONLY
+#define RPL_CLIENT_ONLY RPL_CONF_CLIENT_ONLY
+#else
+#define RPL_CLIENT_ONLY 0
+#endif
+
+#if RPL_CONF_CLIENT_ONLY && RPL_CONF_IS_ROOT
+#error "Client-only node cannot be compiled as RPL root"
+#endif
+
+/*
  * Maximum of concurent RPL instances.
  */
 #ifdef RPL_CONF_MAX_INSTANCES
