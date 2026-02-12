@@ -193,7 +193,7 @@ rpl_dag_root_init(void)
   static uint8_t initialized = 0;
 
   if(!initialized) {
-    LOG6LBR_INFO("### RPL_CONF_CLIENT_ONLY=%d ###\n", RPL_CONF_CLIENT_ONLY);
+    LOG6LBR_INFO("### RPL_CLIENT_ONLY=%d ###\n", RPL_CLIENT_ONLY);
     to_become_root = 0;
     set_global_address();
     uip_ds6_notification_add(&n, route_callback);

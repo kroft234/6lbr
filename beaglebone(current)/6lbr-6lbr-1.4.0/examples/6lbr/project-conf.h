@@ -96,9 +96,6 @@
 // Always use infinite upward route
 #define RPL_CONF_DEFAULT_ROUTE_INFINITE_LIFETIME    1
 
-/* RPL: client-only mode (never become DODAG root) */
-#define RPL_CONF_CLIENT_ONLY 1
-
 // Ethernet header is stored in uip_buf
 #undef UIP_CONF_LLH_LEN
 #define UIP_CONF_LLH_LEN 14
@@ -174,6 +171,9 @@
 /*------------------------------------------------------------------*/
 /* ROUTER MODE                                                      */
 /*------------------------------------------------------------------*/
+
+/* RPL: client-only mode (never become DODAG root) */
+#define RPL_CONF_CLIENT_ONLY 1
 
 #if RPL_CONF_CLIENT_ONLY
 #undef UIP_CONF_ND6_SEND_RA
