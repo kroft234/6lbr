@@ -14,5 +14,6 @@ sudo ip link set eth0 master br0
 sudo ip link set br0 up
 sudo ip addr add 192.168.6.38/24 dev br0
 
+
 # Добавляем default route
 sudo ip route replace default via 192.168.6.254 dev br0
