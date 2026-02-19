@@ -177,20 +177,20 @@
 
 #if RPL_CONF_CLIENT_ONLY
 #undef UIP_CONF_ND6_SEND_RA
-#define UIP_CONF_ND6_SEND_RA 0
-#warning "UIP_CONF_ND6_SEND_RA 0 (Client-only mode)"
+#define UIP_CONF_ND6_SEND_RA 1
+#warning "UIP_CONF_ND6_SEND_RA 1 (Client-only mode)"
 #else
 #undef UIP_CONF_ND6_SEND_RA
 #define UIP_CONF_ND6_SEND_RA 1
 #endif
 
 #undef UIP_CONF_ND6_DEF_MAXDADNS
-#define UIP_CONF_ND6_DEF_MAXDADNS	1
+#define UIP_CONF_ND6_DEF_MAXDADNS  1
 
 //Local link address is already reserved
 #define UIP_CONF_DS6_ADDR_NBU 5
 
-#define UIP_CONF_DS6_ROUTE_INFORMATION	1
+#define UIP_CONF_DS6_ROUTE_INFORMATION  1
 
 #define UIP_CONF_ND6_RA_RDNSS 1
 
@@ -216,22 +216,22 @@
 #endif
 
 // Фильтруем RPL трафик на Ethernet (DIO, DAO)
-#define CETIC_6LBR_ETH_FILTER_RPL 1
+//#define CETIC_6LBR_ETH_FILTER_RPL 1
 
 // Фильтруем RA для WSN сегмента
-#define CETIC_6LBR_WSN_FILTER_RA 1
+//#define CETIC_6LBR_WSN_FILTER_RA 1
 
-/*#if CETIC_6LBR_ONE_ITF*/
-/*#define CETIC_6LBR_ETH_FILTER_RPL	0*/
-/*#else*/
-/*#define CETIC_6LBR_ETH_FILTER_RPL	1*/
-/*#endif*/
+#if CETIC_6LBR_ONE_ITF
+#define CETIC_6LBR_ETH_FILTER_RPL  0
+#else
+#define CETIC_6LBR_ETH_FILTER_RPL  1
+#endif
 
-/*#if UIP_CONF_IPV6_RPL*/
-/*#define CETIC_6LBR_WSN_FILTER_RA	1*/
-/*#else*/
-/*#define CETIC_6LBR_WSN_FILTER_RA	0*/
-/*#endif*/
+#if UIP_CONF_IPV6_RPL
+#define CETIC_6LBR_WSN_FILTER_RA  1
+#else
+#define CETIC_6LBR_WSN_FILTER_RA  0
+#endif
 
 /*------------------------------------------------------------------*/
 #endif

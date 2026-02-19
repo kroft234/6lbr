@@ -58,7 +58,8 @@
 
 #include <string.h>
 
-#define DEBUG DEBUG_NONE
+#define DEBUG DEBUG_PRINT
+/*#define DEBUG DEBUG_NONE*/
 #include "net/ip/uip-debug.h"
 
 #if UIP_LOGGING
@@ -114,6 +115,22 @@ enum {
   UDP_POLL,
   PACKET_INPUT
 };
+
+/*------------------------------------------------------------1*/
+#define SSH_PORT 22
+#define NAT_TABLE_SIZE 8
+
+struct nat_entry {
+    uip_ip6addr_t orig_src;   // IP Orangepi
+    uint16_t orig_src_port;   // порт Orangepi
+    uip_ip6addr_t new_dst;    // IP Linux (bbbb::)
+    uint16_t new_dst_port;    // порт Linux (22)
+    uint8_t valid;
+};
+
+static struct nat_entry nat_table[NAT_TABLE_SIZE];
+/*------------------------------------------------------------1*/
+
 
 /* Called on IP packet output. */
 #if NETSTACK_CONF_WITH_IPV6
@@ -202,6 +219,7 @@ start_periodic_tcp_timer(void)
   }
 }
 /*---------------------------------------------------------------------------*/
+/* Проверка входящего SYN (Orangepi -> BeagleBone) */
 void
 check_for_tcp_syn(void)
 {
@@ -219,22 +237,116 @@ check_for_tcp_syn(void)
 
     /* --- Логирование всех TCP SYN --- */
     PRINTF("Incoming TCP SYN from ");
-    PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
+    PRINTF(&UIP_IP_BUF->srcipaddr);
     PRINTF(" to port %u\n", uip_ntohs(UIP_TCP_BUF->destport));
+
+    uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
+
+    // Если порт не открыт в Contiki (например SSH или любой другой)
+    if(dst_port == SSH_PORT) {
+
+	PRINTF(">>> SSH PORT MATCH (22) <<<\n");
+        // --- NAT запись ---
+        struct nat_entry *e = NULL;
+        for(int i = 0; i < NAT_TABLE_SIZE; i++) {
+            if(!nat_table[i].valid) { 
+		e = &nat_table[i];
+		PRINTF("Using NAT slot %d\n", i); 
+		break; 
+	    }
+        }
+        if(!e){
+	 e = &nat_table[0]; // если нет места, заменяем первую
+	 PRINTF("NAT table full, overwriting 0\n");
+	}
+
+        e->orig_src = UIP_IP_BUF->srcipaddr;
+        e->orig_src_port = uip_ntohs(UIP_TCP_BUF->srcport);
+
+        // Новый адрес назначения — Linux префикс bbbb::/64 + оригинальные последние 64 бита
+        uip_ip6addr(&e->new_dst, 0xbbbb,0,0,0,0,0,0,0);
+        e->new_dst.u16[4] = UIP_IP_BUF->destipaddr.u16[4];
+        e->new_dst.u16[5] = UIP_IP_BUF->destipaddr.u16[5];
+        e->new_dst.u16[6] = UIP_IP_BUF->destipaddr.u16[6];
+        e->new_dst.u16[7] = UIP_IP_BUF->destipaddr.u16[7];
+
+        e->new_dst_port = dst_port;
+        e->valid = 1;
+
+        PRINTF("NAT rewrite:\n");
+        PRINTF("New DST: "); PRINT6ADDR(&e->new_dst); PRINTF("\n");
+
+        // Меняем адрес и порт пакета для Linux
+        uip_ip6addr_copy(&UIP_IP_BUF->destipaddr, &e->new_dst);
+        UIP_TCP_BUF->destport = uip_htons(e->new_dst_port);
+
+        PRINTF("Sending packet to Linux via SLIP\n");
+        PRINTF("uip_len before send = %u\n", uip_len);
+
+        // Отправляем пакет на Linux
+        slip_send(uip_buf, uip_len);
+
+        PRINTF("Packet sent to Linux\n");
+
+        // Обнуляем длину, чтобы Contiki не генерировал RST
+        uip_len = 0;
+	PRINTF("uip_len set to 0 to avoid RST\n");
+        return;
+    }  
   }
 #endif /* UIP_TCP || UIP_CONF_IP_FORWARD */
+}
+/*---------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------------*/
+/* Проверка обратного пакета (Linux -> BeagleBone -> Orangepi) */
+void check_nat_reverse(void)
+{
+	PRINTF("\n--- CHECK NAT REVERSE ---\n");
+	PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
+	PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+	PRINTF("SRC PORT: %u\n", uip_ntohs(UIP_TCP_BUF->srcport));
+	PRINTF("DST PORT: %u\n", uip_ntohs(UIP_TCP_BUF->destport));
+    if(UIP_IP_BUF->proto != UIP_PROTO_TCP) return;
+
+    uint16_t src_port = uip_ntohs(UIP_TCP_BUF->srcport);
+    uint16_t dest_port = uip_ntohs(UIP_TCP_BUF->destport);
+
+    for(int i = 0; i < NAT_TABLE_SIZE; i++) {
+        if(!nat_table[i].valid) continue;
+
+        // Ищем пакет от Linux к BeagleBone
+        if(uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr, &nat_table[i].new_dst) &&
+           dest_port == nat_table[i].new_dst_port) {
+
+            // Меняем src/dst обратно на Orangepi
+            uip_ip6addr_copy(&UIP_IP_BUF->srcipaddr, &nat_table[i].orig_src);
+            UIP_TCP_BUF->srcport = uip_htons(nat_table[i].orig_src_port);
+
+            uip_ip6addr_copy(&UIP_IP_BUF->destipaddr, &nat_table[i].orig_src);
+            UIP_TCP_BUF->destport = uip_htons(nat_table[i].orig_src_port);
+
+            break;
+        }
+    }
 }
 /*---------------------------------------------------------------------------*/
 static void
 packet_input(void)
 {
 #if UIP_CONF_IP_FORWARD
+PRINTF("\n=== PACKET_INPUT START ===\n");
+PRINTF("uip_len = %u\n", uip_len);
   if(uip_len > 0) {
+  PRINTF("IP proto = %u\n", UIP_IP_BUF->proto);
+  PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
+  PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
     tcpip_is_forwarding = 1;
     if(uip_fw_forward() == UIP_FW_LOCAL) {
       tcpip_is_forwarding = 0;
-      check_for_tcp_syn();
-      uip_input();
+      check_for_tcp_syn();// обработка SYN и NAT вперед
+      check_nat_reverse();  // обратные пакеты
+      uip_input();// стек uIP обрабатывает пакет дальше
       if(uip_len > 0) {
 #if UIP_CONF_TCP_SPLIT
         uip_split_output();
@@ -252,6 +364,9 @@ packet_input(void)
   }
 #else /* UIP_CONF_IP_FORWARD */
   if(uip_len > 0) {
+  PRINTF("IP proto2 = %u\n", UIP_IP_BUF->proto);
+  PRINTF("SRC2: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
+  PRINTF("DST2: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
     check_for_tcp_syn();
     uip_input();
     if(uip_len > 0) {
@@ -826,6 +941,15 @@ tcpip_poll_tcp(struct uip_conn *conn)
 void
 tcpip_uipcall(void)
 {
+if(uip_aborted()) {
+  PRINTF("!!! TCP ABORTED (RST sent) !!!\n");
+}
+if(uip_timedout()) {
+  PRINTF("!!! TCP TIMEOUT !!!\n");
+}
+if(uip_closed()) {
+  PRINTF("!!! TCP CLOSED !!!\n");
+}
   uip_udp_appstate_t *ts;
   
 #if UIP_UDP
@@ -870,6 +994,7 @@ tcpip_uipcall(void)
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(tcpip_process, ev, data)
 {
+  PRINTF("=== TCPIP STARTED ===\n");
   PROCESS_BEGIN();
   
   tcpip_set_inputfunc(tcpip_inputfunc);

@@ -204,125 +204,136 @@ int cetic_6lbr_allowed_node_default_hook(rpl_dag_t *dag, uip_ipaddr_t *prefix, i
   return 1;
 }
 /*---------------------------------------------------------------------------*/
-void cetic_6lbr_init(void)
+void
+cetic_6lbr_init(void)
 {
-    uip_ds6_addr_t *local = uip_ds6_get_link_local(-1);
+  uip_ds6_addr_t *local = uip_ds6_get_link_local(-1);
 
-    uip_ipaddr_copy(&wsn_ip_local_addr, &local->ipaddr);
-    LOG6LBR_6ADDR(INFO, &wsn_ip_local_addr, "Tentative local IPv6 address ");
+  uip_ipaddr_copy(&wsn_ip_local_addr, &local->ipaddr);
+
+  LOG6LBR_6ADDR(INFO, &wsn_ip_local_addr, "Tentative local IPv6 address ");
 
 #if CETIC_6LBR_SMARTBRIDGE
-    if ((nvm_data.mode & CETIC_MODE_WAIT_RA_MASK) == 0) { // Manual configuration
-        memcpy(wsn_net_prefix.u8, &nvm_data.wsn_net_prefix, sizeof(nvm_data.wsn_net_prefix));
-        wsn_net_prefix_len = nvm_data.wsn_net_prefix_len;
 
-        if ((nvm_data.mode & CETIC_MODE_WSN_AUTOCONF) != 0) { // Address auto configuration
-            uip_ipaddr_copy(&wsn_ip_addr, &wsn_net_prefix);
-            uip_ds6_set_addr_iid(&wsn_ip_addr, &uip_lladdr);
-            uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_AUTOCONF);
-        } else {
-            memcpy(wsn_ip_addr.u8, &nvm_data.wsn_ip_addr, sizeof(nvm_data.wsn_ip_addr));
-            uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_MANUAL);
-        }
-
-        LOG6LBR_6ADDR(INFO, &wsn_ip_addr, "Tentative global IPv6 address ");
-        memcpy(eth_dft_router.u8, &nvm_data.eth_dft_router, sizeof(nvm_data.eth_dft_router));
-
-        if (!uip_is_addr_unspecified(&eth_dft_router)) {
-            uip_ds6_defrt_add(&eth_dft_router, 0);
-        }
-
-        uip_ipaddr_t dns;
-        memcpy(dns.u8, &nvm_data.dns_server, sizeof(nvm_data.dns_server));
-        uip_nameserver_update(&dns, UIP_NAMESERVER_INFINITE_LIFETIME);
-    } else { // End manual configuration
-        uip_create_unspecified(&wsn_net_prefix);
-        wsn_net_prefix_len = 0;
-        uip_create_unspecified(&wsn_ip_addr);
+  if((nvm_data.mode & CETIC_MODE_WAIT_RA_MASK) == 0)    //Manual configuration
+  {
+    memcpy(wsn_net_prefix.u8, &nvm_data.wsn_net_prefix,
+           sizeof(nvm_data.wsn_net_prefix));
+    wsn_net_prefix_len = nvm_data.wsn_net_prefix_len;
+    if((nvm_data.mode & CETIC_MODE_WSN_AUTOCONF) != 0)  //Address auto configuration
+    {
+      uip_ipaddr_copy(&wsn_ip_addr, &wsn_net_prefix);
+      uip_ds6_set_addr_iid(&wsn_ip_addr, &uip_lladdr);
+      uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_AUTOCONF);
+    } else {
+      memcpy(wsn_ip_addr.u8, &nvm_data.wsn_ip_addr,
+             sizeof(nvm_data.wsn_ip_addr));
+      uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_MANUAL);
     }
+    LOG6LBR_6ADDR(INFO, &wsn_ip_addr, "Tentative global IPv6 address ");
+    memcpy(eth_dft_router.u8, &nvm_data.eth_dft_router,
+           sizeof(nvm_data.eth_dft_router));
+    if ( !uip_is_addr_unspecified(&eth_dft_router) ) {
+      uip_ds6_defrt_add(&eth_dft_router, 0);
+    }
+    uip_ipaddr_t dns;
+    memcpy(dns.u8, &nvm_data.dns_server,
+           sizeof(nvm_data.dns_server));
+    uip_nameserver_update(&dns, UIP_NAMESERVER_INFINITE_LIFETIME);
+  } else {                            //End manual configuration
+    uip_create_unspecified(&wsn_net_prefix);
+    wsn_net_prefix_len = 0;
+    uip_create_unspecified(&wsn_ip_addr);
+  }
 #endif
 
 #if CETIC_6LBR_ROUTER
-    // WSN network configuration
-    memcpy(wsn_net_prefix.u8, &nvm_data.wsn_net_prefix, sizeof(nvm_data.wsn_net_prefix));
-    wsn_net_prefix_len = nvm_data.wsn_net_prefix_len;
+  //WSN network configuration
+  memcpy(wsn_net_prefix.u8, &nvm_data.wsn_net_prefix,
+         sizeof(nvm_data.wsn_net_prefix));
+  wsn_net_prefix_len = nvm_data.wsn_net_prefix_len;
+  if((nvm_data.mode & CETIC_MODE_WSN_AUTOCONF) != 0)    //Address auto configuration
+  {
+    uip_ipaddr_copy(&wsn_ip_addr, &wsn_net_prefix);
+    uip_ds6_set_addr_iid(&wsn_ip_addr, &uip_lladdr);
+    uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_AUTOCONF);
+  } else {
+    memcpy(wsn_ip_addr.u8, &nvm_data.wsn_ip_addr,
+           sizeof(nvm_data.wsn_ip_addr));
+    uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_MANUAL);
+  }
+  LOG6LBR_6ADDR(INFO, &wsn_ip_addr, "Tentative global IPv6 address (WSN) ");
+  uip_ipaddr_t dns;
+  memcpy(dns.u8, &nvm_data.dns_server,
+         sizeof(nvm_data.dns_server));
+  uip_nameserver_update(&dns, UIP_NAMESERVER_INFINITE_LIFETIME);
 
-    if ((nvm_data.mode & CETIC_MODE_WSN_AUTOCONF) != 0) {
-        uip_ipaddr_copy(&wsn_ip_addr, &wsn_net_prefix);
-        uip_ds6_set_addr_iid(&wsn_ip_addr, &uip_lladdr);
-        uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_AUTOCONF);
-    } else {
-        memcpy(wsn_ip_addr.u8, &nvm_data.wsn_ip_addr, sizeof(nvm_data.wsn_ip_addr));
-        uip_ds6_addr_add(&wsn_ip_addr, 0, ADDR_MANUAL);
-    }
+  //Ethernet network configuration
+  memcpy(eth_net_prefix.u8, &nvm_data.eth_net_prefix,
+         sizeof(nvm_data.eth_net_prefix));
+  memcpy(eth_dft_router.u8, &nvm_data.eth_dft_router,
+         sizeof(nvm_data.eth_dft_router));
 
-    LOG6LBR_6ADDR(INFO, &wsn_ip_addr, "Tentative global IPv6 address (WSN) ");
+  if ( !uip_is_addr_unspecified(&eth_dft_router) ) {
+    uip_ds6_defrt_add(&eth_dft_router, 0);
+  }
 
-    uip_ipaddr_t dns;
-    memcpy(dns.u8, &nvm_data.dns_server, sizeof(nvm_data.dns_server));
-    uip_nameserver_update(&dns, UIP_NAMESERVER_INFINITE_LIFETIME);
+  eth_mac64_addr.addr[0] = eth_mac_addr[0];
+  eth_mac64_addr.addr[1] = eth_mac_addr[1];
+  eth_mac64_addr.addr[2] = eth_mac_addr[2];
+  eth_mac64_addr.addr[3] = CETIC_6LBR_ETH_EXT_A;
+  eth_mac64_addr.addr[4] = CETIC_6LBR_ETH_EXT_B;
+  eth_mac64_addr.addr[5] = eth_mac_addr[3];
+  eth_mac64_addr.addr[6] = eth_mac_addr[4];
+  eth_mac64_addr.addr[7] = eth_mac_addr[5];
 
-    // Ethernet network configuration
-    memcpy(eth_net_prefix.u8, &nvm_data.eth_net_prefix, sizeof(nvm_data.eth_net_prefix));
-    memcpy(eth_dft_router.u8, &nvm_data.eth_dft_router, sizeof(nvm_data.eth_dft_router));
+  if((nvm_data.mode & CETIC_MODE_ETH_AUTOCONF) != 0)    //Address auto configuration
+  {
+    uip_ipaddr_copy(&eth_ip_addr, &eth_net_prefix);
+    uip_ds6_set_addr_iid(&eth_ip_addr, &eth_mac64_addr);
+    uip_ds6_addr_add(&eth_ip_addr, 0, ADDR_AUTOCONF);
+  } else {
+    memcpy(eth_ip_addr.u8, &nvm_data.eth_ip_addr,
+           sizeof(nvm_data.eth_ip_addr));
+    uip_ds6_addr_add(&eth_ip_addr, 0, ADDR_MANUAL);
+  }
+  LOG6LBR_6ADDR(INFO, &eth_ip_addr, "Tentative global IPv6 address (ETH) ");
 
-    if (!uip_is_addr_unspecified(&eth_dft_router)) {
-        uip_ds6_defrt_add(&eth_dft_router, 0);
-    }
+  //Ugly hack : in order to set WSN local address as the default address
+  //We must add it afterwards as uip_ds6_addr_add allocates addr from the end of the list
+  uip_ds6_addr_rm(local);
 
-    eth_mac64_addr.addr[0] = eth_mac_addr[0];
-    eth_mac64_addr.addr[1] = eth_mac_addr[1];
-    eth_mac64_addr.addr[2] = eth_mac_addr[2];
-    eth_mac64_addr.addr[3] = CETIC_6LBR_ETH_EXT_A;
-    eth_mac64_addr.addr[4] = CETIC_6LBR_ETH_EXT_B;
-    eth_mac64_addr.addr[5] = eth_mac_addr[3];
-    eth_mac64_addr.addr[6] = eth_mac_addr[4];
-    eth_mac64_addr.addr[7] = eth_mac_addr[5];
+  uip_create_linklocal_prefix(&eth_ip_local_addr);
+  uip_ds6_set_addr_iid(&eth_ip_local_addr, &eth_mac64_addr);
+  uip_ds6_addr_add(&eth_ip_local_addr, 0, ADDR_AUTOCONF);
 
-    if ((nvm_data.mode & CETIC_MODE_ETH_AUTOCONF) != 0) {
-        uip_ipaddr_copy(&eth_ip_addr, &eth_net_prefix);
-        uip_ds6_set_addr_iid(&eth_ip_addr, &eth_mac64_addr);
-        uip_ds6_addr_add(&eth_ip_addr, 0, ADDR_AUTOCONF);
-    } else {
-        memcpy(eth_ip_addr.u8, &nvm_data.eth_ip_addr, sizeof(nvm_data.eth_ip_addr));
-        uip_ds6_addr_add(&eth_ip_addr, 0, ADDR_MANUAL);
-    }
+  uip_ds6_addr_add(&wsn_ip_local_addr, 0, ADDR_AUTOCONF);
 
-    LOG6LBR_6ADDR(INFO, &eth_ip_addr, "Tentative global IPv6 address (ETH) ");
-
-    // Set WSN local address as default
-    uip_ds6_addr_rm(local);
-
-    uip_create_linklocal_prefix(&eth_ip_local_addr);
-    uip_ds6_set_addr_iid(&eth_ip_local_addr, &eth_mac64_addr);
-    uip_ds6_addr_add(&eth_ip_local_addr, 0, ADDR_AUTOCONF);
-
-    uip_ds6_addr_add(&wsn_ip_local_addr, 0, ADDR_AUTOCONF);
-
-    // Prefix and RA configuration
+  //Prefix and RA configuration
 #if UIP_CONF_IPV6_RPL
-    if (!RPL_CLIENT_ONLY) {
-        uint8_t publish = (nvm_data.ra_prefix_flags & CETIC_6LBR_MODE_SEND_PIO) != 0;
-        uip_ds6_prefix_add(&eth_net_prefix, nvm_data.eth_net_prefix_len, publish,
-                           nvm_data.ra_prefix_flags,
-                           nvm_data.ra_prefix_vtime, nvm_data.ra_prefix_ptime);
-
-        if ((nvm_data.ra_rio_flags & CETIC_6LBR_MODE_SEND_RIO) != 0) {
-            uip_ds6_route_info_add(&wsn_net_prefix, nvm_data.wsn_net_prefix_len,
-                                   nvm_data.ra_rio_flags, nvm_data.ra_rio_lifetime);
-        }
-    } else {
-        LOG6LBR_INFO("RPL Client Only: RA/PIO/RIO disabled\n");
-    }
+  uint8_t publish = (nvm_data.ra_prefix_flags & CETIC_6LBR_MODE_SEND_PIO) != 0;
+  uip_ds6_prefix_add(&eth_net_prefix, nvm_data.eth_net_prefix_len, publish,
+                     nvm_data.ra_prefix_flags,
+                     nvm_data.ra_prefix_vtime, nvm_data.ra_prefix_ptime);
+#else
+  uip_ds6_prefix_add(&eth_net_prefix, nvm_data.eth_net_prefix_len, 0, 0, 0, 0);
+  uint8_t publish = (nvm_data.ra_prefix_flags & CETIC_6LBR_MODE_SEND_PIO) != 0;
+  uip_ds6_prefix_add(&wsn_net_prefix, nvm_data.wsn_net_prefix_len, publish,
+		             nvm_data.ra_prefix_flags,
+		             nvm_data.ra_prefix_vtime, nvm_data.ra_prefix_ptime);
 #endif
 
-    if ((nvm_data.mode & CETIC_MODE_ROUTER_RA_DAEMON) != 0) {
-        LOG6LBR_INFO("RA Daemon enabled\n");
-    } else {
-        LOG6LBR_INFO("RA Daemon disabled\n");
-    }
-
-#endif // CETIC_6LBR_ROUTER
+#if UIP_CONF_IPV6_RPL
+  if ((nvm_data.ra_rio_flags & CETIC_6LBR_MODE_SEND_RIO) != 0 ) {
+    uip_ds6_route_info_add(&wsn_net_prefix, nvm_data.wsn_net_prefix_len, nvm_data.ra_rio_flags, nvm_data.ra_rio_lifetime);
+  }
+#endif
+  if ((nvm_data.mode & CETIC_MODE_ROUTER_RA_DAEMON) != 0 ) {
+    LOG6LBR_INFO("RA Daemon enabled\n");
+  } else {
+    LOG6LBR_INFO("RA Daemon disabled\n");
+  }
+#endif
 }
 
 void
@@ -330,7 +341,7 @@ cetic_6lbr_init_finalize(void)
 {
 #if UIP_CONF_IPV6_RPL && CETIC_6LBR_DODAG_ROOT
 
-  // Р•СЃР»Рё РІРєР»СЋС‡С‘РЅ СЂРµР¶РёРј С‚РѕР»СЊРєРѕ РєР»РёРµРЅС‚
+  // Если включён режим только клиент
   if(RPL_CLIENT_ONLY) {
     cetic_dag = NULL;
     LOG6LBR_INFO("RPL Client Only mode: DODAG root disabled\n");
@@ -374,7 +385,7 @@ cetic_6lbr_init_finalize(void)
   }
 #endif
 
-// РћСЃС‚Р°Р»СЊРЅР°СЏ С‡Р°СЃС‚СЊ РјРµС‚РѕРґР° РѕСЃС‚Р°С‘С‚СЃСЏ Р±РµР· РёР·РјРµРЅРµРЅРёР№
+// Остальная часть метода остаётся без изменений
 #if CETIC_6LBR_IP64
   if((nvm_data.global_flags & CETIC_GLOBAL_IP64) != 0) {
     LOG6LBR_INFO("Starting IP64\n");

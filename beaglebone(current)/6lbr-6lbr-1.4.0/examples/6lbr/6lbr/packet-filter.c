@@ -387,14 +387,6 @@ eth_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
     LOG6LBR_ERROR("ethernet_output: sending to self\n");
     return 0;
   }
-#if RPL_CONF_CLIENT_ONLY
-  // Block RA/RS going out Ethernet
-  if(UIP_IP_BUF->proto == UIP_PROTO_ICMP6 &&
-     (UIP_ICMP_BUF->type == ICMP6_RA || UIP_ICMP_BUF->type == ICMP6_RS)) {
-    LOG6LBR_PRINTF(PACKET, PF_OUT, "eth_output: Blocking RA/RS on Ethernet\n");
-    return 0;
-  }
-#endif
 
 #if CETIC_6LBR_ETH_FILTER_RPL
   //Filter out RPL (broadcast) traffic
