@@ -280,7 +280,8 @@ void uip_log(char *msg);
  */
 
 /** The maximum transmission unit at the IP Layer*/
-#define UIP_LINK_MTU 1280
+/*#define UIP_LINK_MTU 1280*/
+#define UIP_LINK_MTU 1500
 
 #ifndef NETSTACK_CONF_WITH_IPV6
 /** Do we use IPv6 or not (default: no) */

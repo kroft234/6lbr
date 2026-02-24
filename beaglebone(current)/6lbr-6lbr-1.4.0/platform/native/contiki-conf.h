@@ -132,6 +132,7 @@ typedef unsigned int uip_stats_t;
 #define UIP_CONF_ND6_REACHABLE_TIME     600000
 #define UIP_CONF_ND6_RETRANS_TIMER      10000
 
+/*#define UIP_CONF_IP_FORWARD             1*/
 #define UIP_CONF_IP_FORWARD             0
 #ifndef UIP_CONF_BUFFER_SIZE
 #define UIP_CONF_BUFFER_SIZE		240
