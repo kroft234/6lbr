@@ -71,7 +71,8 @@
 
 #include <stdio.h>
 
-#define DEBUG DEBUG_NONE
+/*#define DEBUG DEBUG_NONE*/
+#define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 #if DEBUG
 /* PRINTFI and PRINTFO are defined for input and output to debug one without changing the timing of the other */
@@ -493,6 +494,11 @@ static void
 compress_hdr_hc06(linkaddr_t *link_destaddr)
 {
   uint8_t tmp, iphc0, iphc1;
+  /*printf("compress_hdr_hc06 START: proto = %d\n", UIP_IP_BUF->proto);*/
+  printf("compress_hdr_hc06 ENTERED: proto = %d, iphc1 start = 0x%02x\n", UIP_IP_BUF->proto, iphc1);
+
+  hc06_ptr = packetbuf_ptr + 2;
+
 #if DEBUG
   { uint16_t ndx;
     PRINTF("before compression (%d): ", UIP_IP_BUF->len[1]);
@@ -504,7 +510,7 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
   }
 #endif
 
-  hc06_ptr = packetbuf_ptr + 2;
+  /*hc06_ptr = packetbuf_ptr + 2;*/
   /*
    * As we copy some bit-length fields, in the IPHC encoding bytes,
    * we sometimes use |=
@@ -514,14 +520,14 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
 
   iphc0 = SICSLOWPAN_DISPATCH_IPHC;
   iphc1 = 0;
-  PACKETBUF_IPHC_BUF[2] = 0; /* might not be used - but needs to be cleared */
+  PACKETBUF_IPHC_BUF[2] = 0;/* might not be used - but needs to be cleared */
+  printf("compress_hdr_hc06: after init iphc0=0x%02x iphc1=0x%02x\n", iphc0, iphc1);
 
   /*
    * Address handling needs to be made first since it might
    * cause an extra byte with [ SCI | DCI ]
    *
    */
-
 
   /* check if dest context exists (for allocating third byte) */
   /* TODO: fix this so that it remembers the looked up values for
@@ -532,7 +538,16 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
     PRINTF("IPHC: compressing dest or src ipaddr - setting CID\n");
     iphc1 |= SICSLOWPAN_IPHC_CID;
     hc06_ptr++;
-  }
+    // Сразу сбрасываем CID после установки
+    iphc1 &= ~SICSLOWPAN_IPHC_CID;
+    printf("compress_hdr_hc06: CID was set but forced DISABLED right after\n");
+  } else {
+    printf("compress_hdr_hc06: no CID needed, iphc1 = 0x%02x\n", iphc1);
+  }  
+  // Принудительно выключаем CID для всех пакетов
+  iphc1 &= ~SICSLOWPAN_IPHC_CID;
+  printf("compress_hdr_hc06: CID forced DISABLED, iphc1 now = 0x%02x (CID bit = %d)\n",
+         iphc1, (iphc1 & SICSLOWPAN_IPHC_CID) ? 1 : 0);
 
   /*
    * Traffic class, flow label
@@ -579,21 +594,35 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
 
   /* Note that the payload length is always compressed */
 
-  /* Next header. We compress it if UDP */
+/* Next header. We compress it if UDP */
 #if UIP_CONF_UDP || UIP_CONF_ROUTER
-  if(UIP_IP_BUF->proto == UIP_PROTO_UDP) {
+  printf("compress_hdr_hc06: trying to compress proto = %d (UDP=17, TCP=6, ICMPv6=58)\n", UIP_IP_BUF->proto);
+  /*if(UIP_IP_BUF->proto == UIP_PROTO_UDP) {
     iphc0 |= SICSLOWPAN_IPHC_NH_C;
-  }
+    printf("compress_hdr_hc06: NH_C enabled for UDP\n");
+  }*/
 #endif /*UIP_CONF_UDP*/
-#ifdef SICSLOWPAN_NH_COMPRESSOR 
-  if(SICSLOWPAN_NH_COMPRESSOR.is_compressable(UIP_IP_BUF->proto)) {
+
+#ifdef SICSLOWPAN_NH_COMPRESSOR
+  if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
+    printf("compress_hdr_hc06: SKIPPING NH_COMPRESSOR for TCP (proto=6)\n");
+  } else if(SICSLOWPAN_NH_COMPRESSOR.is_compressable(UIP_IP_BUF->proto)) {
     iphc0 |= SICSLOWPAN_IPHC_NH_C;
+    printf("compress_hdr_hc06: NH_COMPRESSOR enabled for proto=%d\n", UIP_IP_BUF->proto);
   }
 #endif
-  if ((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
+
+  /* Принудительно выключаем NH_C — после ВСЕХ проверок */
+  iphc0 &= ~SICSLOWPAN_IPHC_NH_C;
+  printf("compress_hdr_hc06: NH_C forced DISABLED, final iphc0 = 0x%02x\n", iphc0);
+
+  /*if ((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
     *hc06_ptr = UIP_IP_BUF->proto;
     hc06_ptr += 1;
-  }
+    printf("compress_hdr_hc06: next header INLINE proto=%d\n", UIP_IP_BUF->proto);
+  } else {
+    printf("compress_hdr_hc06: NH_C STILL ENABLED AFTER FORCED DISABLE — ERROR!\n");
+  }*/
 
   /*
    * Hop limit
@@ -616,6 +645,15 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
       *hc06_ptr = UIP_IP_BUF->ttl;
       hc06_ptr += 1;
       break;
+  }
+
+/* ВОТ ЗДЕСЬ — правильное место для inline next-header (после TC/FL и Hop Limit) */
+  if ((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
+    *hc06_ptr = UIP_IP_BUF->proto;
+    hc06_ptr += 1;
+    printf("compress_hdr_hc06: next header INLINE proto=%d written at correct position\n", UIP_IP_BUF->proto);
+  } else {
+    printf("compress_hdr_hc06: NH_C STILL ENABLED — ERROR!\n");
   }
 
   /* source address - cannot be multicast */
@@ -753,16 +791,21 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
   }
 #endif /*UIP_CONF_UDP*/
 
-#ifdef SICSLOWPAN_NH_COMPRESSOR
-  /* if nothing to compress just return zero  */
+/*#ifdef SICSLOWPAN_NH_COMPRESSOR
+  if nothing to compress just return zero
   hc06_ptr += SICSLOWPAN_NH_COMPRESSOR.compress(hc06_ptr, &uncomp_hdr_len);
+#endif*/
+#ifdef SICSLOWPAN_NH_COMPRESSOR
+  printf("compress_hdr_hc06: SICSLOWPAN_NH_COMPRESSOR disabled to avoid overwriting headers\n");
+  // hc06_ptr += SICSLOWPAN_NH_COMPRESSOR.compress(hc06_ptr, &uncomp_hdr_len);
 #endif
 
   /* before the packetbuf_hdr_len operation */
   PACKETBUF_IPHC_BUF[0] = iphc0;
   PACKETBUF_IPHC_BUF[1] = iphc1;
 
-  packetbuf_hdr_len = hc06_ptr - packetbuf_ptr;
+  packetbuf_hdr_len = hc06_ptr - packetbuf_ptr; 
+  printf("compress_hdr_hc06 EXITED: packetbuf_hdr_len = %d, final iphc1 = 0x%02x\n", packetbuf_hdr_len, iphc1); 
   return;
 }
 
@@ -854,6 +897,10 @@ uncompress_hdr_hc06(uint16_t ip_len)
     hc06_ptr += 1;
   }
 
+/*--- Дополнительный лог для ранней диагностики ----------------------*/
+printf("uncompress_hdr_hc06: proto BEFORE addr uncompress = %d\n", SICSLOWPAN_IP_BUF->proto);
+/*--------------------------------------------------------------------*/
+
   /* put the source address compression mode SAM in the tmp var */
   tmp = ((iphc1 & SICSLOWPAN_IPHC_SAM_11) >> SICSLOWPAN_IPHC_SAM_BIT) & 0x03;
 
@@ -931,6 +978,7 @@ uncompress_hdr_hc06(uint16_t ip_len)
 
   /* Next header processing - continued */
   if((iphc0 & SICSLOWPAN_IPHC_NH_C)) {
+    PRINTF("uncompress_hdr_hc06: NH_C=1 (next-header compressed), checking NHC dispatch 0x%02x\n", *hc06_ptr);
     /* The next header is compressed, NHC is following */
     if((*hc06_ptr & SICSLOWPAN_NHC_UDP_MASK) == SICSLOWPAN_NHC_UDP_ID) {
       uint8_t checksum_compressed;
@@ -998,6 +1046,22 @@ uncompress_hdr_hc06(uint16_t ip_len)
     }
 #endif
   }
+
+/* ----------------------------------------------------------------*/
+  /* ЭТОТ БЛОК ДОЛЖЕН БЫТЬ ЗДЕСЬ — ПОСЛЕ ВСЕЙ ОБРАБОТКИ NEXT HEADER*/
+  printf("uncompress_hdr_hc06: FINAL proto after full decompression = %d  ", SICSLOWPAN_IP_BUF->proto);
+  if (SICSLOWPAN_IP_BUF->proto == UIP_PROTO_TCP) {
+    printf("TCP !!! dport = %u  flags = 0x%02x\n",
+           uip_ntohs(UIP_TCP_BUF->destport), UIP_TCP_BUF->flags);
+  } else if (SICSLOWPAN_IP_BUF->proto == UIP_PROTO_UDP) {
+    printf("UDP sport/dport = %u/%u\n",
+           uip_ntohs(UIP_UDP_BUF->srcport), uip_ntohs(UIP_UDP_BUF->destport));
+  } else if (SICSLOWPAN_IP_BUF->proto == UIP_PROTO_ICMP6) {
+    printf("ICMPv6 type = %d\n", UIP_ICMP_BUF->type);
+  } else {
+    printf("UNKNOWN / BROKEN proto (likely compression failed for TCP)\n");
+  }
+/* ----------------------------------------------------------------*/
 
   packetbuf_hdr_len = hc06_ptr - packetbuf_ptr;
   
@@ -1613,12 +1677,14 @@ input(void)
   
   // ===== Вывод адресов до декомпрессии =====
   PRINTF("sicslowpan input: SRC-before: ");
-  for(int i = 0; i < sizeof(linkaddr_t); i++) {
-    PRINTF("%02x", ((uint8_t *)&packetbuf_addr(PACKETBUF_ADDR_SENDER))[i]);
+  const uint8_t *sender = (const uint8_t *)packetbuf_addr(PACKETBUF_ADDR_SENDER);
+  for(int i = 0; i < LINKADDR_SIZE; i++) {
+   PRINTF("%02x", sender[i]);
   }
   PRINTF(" DST-before: ");
-  for(int i = 0; i < sizeof(linkaddr_t); i++) {
-    PRINTF("%02x", ((uint8_t *)&packetbuf_addr(PACKETBUF_ADDR_RECEIVER))[i]);
+  const uint8_t *receiver = (const uint8_t *)packetbuf_addr(PACKETBUF_ADDR_RECEIVER);
+  for(int i = 0; i < LINKADDR_SIZE; i++) {
+   PRINTF("%02x", receiver[i]);
   }
   PRINTF("\n");
 

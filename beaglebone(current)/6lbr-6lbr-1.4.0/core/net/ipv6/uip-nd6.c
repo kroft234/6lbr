@@ -150,6 +150,17 @@ static uip_ds6_route_info_t *rtinfo; /**  Pointer to a route information list en
 #endif
 
 /*------------------------------------------------------------------*/
+/* ND Proxy для виртуального SSH-адреса */
+static uip_ipaddr_t virtual_ssh_addr;
+
+static void nd6_proxy_init(void)
+{
+  uip_ip6addr(&virtual_ssh_addr, 0xaaaa, 0, 0, 0, 0, 0x0212, 0x4b00, 0x040e);
+  virtual_ssh_addr.u16[7] = UIP_HTONS(0xfa83);
+  PRINTF("ND-PROXY: registered virtual SSH address aaaa::212:4b00:40e:fa83\n");
+}
+/*------------------------------------------------------------------*/
+
 /* create a llao */ 
 static void
 create_llao(uint8_t *llao, uint8_t type) {
@@ -180,6 +191,52 @@ ns_input(void)
   PRINTF(" with target address");
   PRINT6ADDR((uip_ipaddr_t *) (&UIP_ND6_NS_BUF->tgtipaddr));
   PRINTF("\n");
+
+  /* ------------------------------------------------
+     ND-PROXY ДЛЯ ВИРТУАЛЬНОГО АДРЕСА SSH
+     ------------------------------------------------ */
+  if (uip_ip6addr_cmp(&UIP_ND6_NS_BUF->tgtipaddr, &virtual_ssh_addr)) {
+    PRINTF("ND-PROXY: answering NS for virtual SSH address aaaa::212:4b00:40e:fa83 !\n");
+
+    // Готовим solicited NA от лица 6LBR
+    uip_ipaddr_copy(&UIP_IP_BUF->destipaddr, &UIP_IP_BUF->srcipaddr);   // unicast ответ отправителю
+    uip_ds6_select_src(&UIP_IP_BUF->srcipaddr, &UIP_IP_BUF->destipaddr); // выбираем подходящий наш src
+
+    UIP_ICMP_BUF->type = ICMP6_NA;
+    UIP_ICMP_BUF->icode = 0;
+
+    UIP_ND6_NA_BUF->flagsreserved = UIP_ND6_NA_FLAG_SOLICITED | UIP_ND6_NA_FLAG_OVERRIDE;
+#if UIP_CONF_ROUTER
+    UIP_ND6_NA_BUF->flagsreserved |= UIP_ND6_NA_FLAG_ROUTER;
+#endif
+
+    // Целевой адрес — наш виртуальный SSH
+    uip_ipaddr_copy(&UIP_ND6_NA_BUF->tgtipaddr, &virtual_ssh_addr);
+
+    // Добавляем Target Link-Layer Address Option — наш собственный MAC
+    nd6_opt_offset = UIP_ND6_NA_LEN;
+    create_llao(&uip_buf[uip_l2_l3_icmp_hdr_len + nd6_opt_offset], UIP_ND6_OPT_TLLAO);
+    nd6_opt_offset += UIP_ND6_OPT_LLAO_LEN;
+
+    // Финализируем длины пакета
+    UIP_IP_BUF->len[0] = 0;
+    UIP_IP_BUF->len[1] = UIP_ICMPH_LEN + UIP_ND6_NA_LEN + UIP_ND6_OPT_LLAO_LEN;
+    uip_len = UIP_IPH_LEN + UIP_ICMPH_LEN + UIP_ND6_NA_LEN + UIP_ND6_OPT_LLAO_LEN;
+
+    // Пересчитываем чек-сумму ICMPv6
+    UIP_ICMP_BUF->icmpchksum = 0;
+    UIP_ICMP_BUF->icmpchksum = ~uip_icmp6chksum();
+
+    UIP_STAT(++uip_stat.nd6.sent);
+
+    PRINTF("Sent proxy NA for virtual SSH address\n");
+
+    return;   // < Важно! Выходим сразу — дальше NS не обрабатываем
+  }
+  /* ------------------------------------------------
+     КОНЕЦ ND-PROXY
+     ------------------------------------------------ */
+
   UIP_STAT(++uip_stat.nd6.recv);
 
 #if UIP_CONF_IPV6_CHECKS
@@ -243,6 +300,7 @@ ns_input(void)
 
   memcpy(&tgtipaddr, &UIP_ND6_NS_BUF->tgtipaddr, sizeof(tgtipaddr));
   addr = uip_ds6_addr_lookup(&tgtipaddr);
+
 #if CETIC_6LBR_SMARTBRIDGE
   //ND Proxy implementation
   if ( addr == NULL ) {
@@ -262,6 +320,7 @@ ns_input(void)
     }
   }
 #endif
+
   if(addr != NULL) {
 #if UIP_ND6_DEF_MAXDADNS > 0
     if(uip_is_addr_unspecified(&UIP_IP_BUF->srcipaddr)) {
@@ -300,7 +359,6 @@ ns_input(void)
       goto discard;
     }
 #endif /*UIP_CONF_IPV6_CHECKS */
-
     /* Address resolution case */
     if(uip_is_addr_solicited_node(&UIP_IP_BUF->destipaddr)) {
       uip_ipaddr_copy(&UIP_IP_BUF->destipaddr, &UIP_IP_BUF->srcipaddr);
@@ -308,7 +366,6 @@ ns_input(void)
       flags = UIP_ND6_NA_FLAG_SOLICITED | UIP_ND6_NA_FLAG_OVERRIDE;
       goto create_na;
     }
-
     /* NUD CASE */
     if(uip_ds6_addr_lookup(&UIP_IP_BUF->destipaddr) == addr) {
       uip_ipaddr_copy(&UIP_IP_BUF->destipaddr, &UIP_IP_BUF->srcipaddr);
@@ -325,7 +382,6 @@ ns_input(void)
     goto discard;
   }
 
-
 create_na:
     /* If the node is a router it should set R flag in NAs */
 #if UIP_CONF_ROUTER
@@ -335,26 +391,20 @@ create_na:
   UIP_IP_BUF->vtc = 0x60;
   UIP_IP_BUF->tcflow = 0;
   UIP_IP_BUF->flow = 0;
-  UIP_IP_BUF->len[0] = 0;       /* length will not be more than 255 */
+  UIP_IP_BUF->len[0] = 0; /* length will not be more than 255 */
   UIP_IP_BUF->len[1] = UIP_ICMPH_LEN + UIP_ND6_NA_LEN + UIP_ND6_OPT_LLAO_LEN;
   UIP_IP_BUF->proto = UIP_PROTO_ICMP6;
   UIP_IP_BUF->ttl = UIP_ND6_HOP_LIMIT;
-
   UIP_ICMP_BUF->type = ICMP6_NA;
   UIP_ICMP_BUF->icode = 0;
-
   UIP_ND6_NA_BUF->flagsreserved = flags;
   memcpy(&UIP_ND6_NA_BUF->tgtipaddr, &tgtipaddr, sizeof(uip_ipaddr_t));
-
   create_llao(&uip_buf[uip_l2_l3_icmp_hdr_len + UIP_ND6_NA_LEN],
               UIP_ND6_OPT_TLLAO);
-
   UIP_ICMP_BUF->icmpchksum = 0;
   UIP_ICMP_BUF->icmpchksum = ~uip_icmp6chksum();
-
   uip_len =
     UIP_IPH_LEN + UIP_ICMPH_LEN + UIP_ND6_NA_LEN + UIP_ND6_OPT_LLAO_LEN;
-
   UIP_STAT(++uip_stat.nd6.sent);
   PRINTF("Sending NA to ");
   PRINT6ADDR(&UIP_IP_BUF->destipaddr);
@@ -370,7 +420,6 @@ discard:
   return;
 }
 #endif /* UIP_ND6_SEND_NA */
-
 
 /*------------------------------------------------------------------*/
 void
@@ -1223,6 +1272,8 @@ uip_nd6_init()
   /* Only process RAs if we are not a router */
   uip_icmp6_register_input_handler(&ra_input_handler);
 #endif
+
+nd6_proxy_init();
 }
 /*---------------------------------------------------------------------------*/
  /** @} */
