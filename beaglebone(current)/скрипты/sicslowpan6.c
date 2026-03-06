@@ -499,7 +499,7 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
   hc06_ptr = packetbuf_ptr + 2;
 
   /*if (UIP_IP_BUF->proto != UIP_PROTO_TCP) {
-    return;  //                              -TCP         (UDP/ICMP    . .)
+    return;  // пропускаем всю функцию для не-TCP пакетов (UDP/ICMP и т.д.)
   }*/
 
   printf("compress_hdr_hc06 ENTERED TCP: proto = %d, iphc1 start = 0x%02x\n", UIP_IP_BUF->proto, iphc1);
@@ -527,21 +527,21 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
   PACKETBUF_IPHC_BUF[2] = 0;/* might not be used - but needs to be cleared */
   printf("compress_hdr_hc06: after init iphc0=0x%02x iphc1=0x%02x\n", iphc0, iphc1);
 
-  // <           :
+  // < Добавь это:
   if (UIP_IP_BUF->proto == UIP_PROTO_TCP &&
       (UIP_TCP_BUF->destport == 0x1600 || UIP_TCP_BUF->srcport == 0x1600)) {
     printf("compress_hdr_hc06: SSH TCP > forcing context byte to 0\n");
-    PACKETBUF_IPHC_BUF[2] = 0;  //                       ,                         
+    PACKETBUF_IPHC_BUF[2] = 0;  // гарантированно очищаем, если вдруг остался мусор
   }
 
-  // <<<              <<<
-  //                                TCP (    UIP_NTOHS)
+  // <<< ВСТАВЬ ЗДЕСЬ <<<
+  // Показываем порт назначения для TCP (без UIP_NTOHS)
   if (UIP_IP_BUF->proto == UIP_PROTO_TCP) {
-    uint16_t dport = UIP_TCP_BUF->destport;  //       network byte order
-    uint16_t dport_host = (dport >> 8) | (dport << 8);  //        ntohs
+    uint16_t dport = UIP_TCP_BUF->destport;  // уже в network byte order
+    uint16_t dport_host = (dport >> 8) | (dport << 8);  // ручной ntohs
     printf("compress_hdr_hc06: TCP destination port = %u (0x%04x)\n", dport_host, dport);
   }  
-  // ^^^               ^^^
+  // ^^^ КОНЕЦ ВСТАВКИ ^^^
 
   /*
    * Address handling needs to be made first since it might
@@ -559,14 +559,14 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
     if (UIP_IP_BUF->proto == UIP_PROTO_TCP &&
       (UIP_TCP_BUF->destport == 0x1600 || UIP_TCP_BUF->srcport == 0x1600)) {
       printf("compress_hdr_hc06: SSH TCP (port 22 in src/dst) > skipping CID allocation\n");
-      //               CID               hc06_ptr                    
+      // НЕ ставим бит CID и НЕ сдвигаем hc06_ptr — просто пропускаем
     } else {
       iphc1 |= SICSLOWPAN_IPHC_CID;
       hc06_ptr++;
       printf("compress_hdr_hc06: CID enabled for non-SSH, hc06_ptr increased\n");
     }
   }
-  //                         CID                 
+  // Принудительно выключаем CID для всех пакетов
   /*iphc1 &= ~SICSLOWPAN_IPHC_CID;*/
   printf("compress_hdr_hc06: CID forced DISABLED, iphc1 now = 0x%02x (CID bit = %d)\n",
          iphc1, (iphc1 & SICSLOWPAN_IPHC_CID) ? 1 : 0);
@@ -634,7 +634,7 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
   }
 #endif
 
-  /*                         NH_C                       */
+  /* Принудительно выключаем NH_C — после ВСЕХ проверок */
   iphc0 &= ~SICSLOWPAN_IPHC_NH_C;
   printf("compress_hdr_hc06: NH_C forced DISABLED, final iphc0 = 0x%02x\n", iphc0);
 
@@ -643,7 +643,7 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
     hc06_ptr += 1;
     printf("compress_hdr_hc06: next header INLINE proto=%d\n", UIP_IP_BUF->proto);
   } else {
-    printf("compress_hdr_hc06: NH_C STILL ENABLED AFTER FORCED DISABLE   ERROR!\n");
+    printf("compress_hdr_hc06: NH_C STILL ENABLED AFTER FORCED DISABLE — ERROR!\n");
   }*/
 
   /*
@@ -669,13 +669,13 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
       break;
   }
 
-/*                                  inline next-header (      TC/FL   Hop Limit) */
+/* ВОТ ЗДЕСЬ — правильное место для inline next-header (после TC/FL и Hop Limit) */
   if ((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
     *hc06_ptr = UIP_IP_BUF->proto;
     hc06_ptr += 1;
     printf("compress_hdr_hc06: next header INLINE proto=%d written at correct position\n", UIP_IP_BUF->proto);
   } else {
-    printf("compress_hdr_hc06: NH_C STILL ENABLED   ERROR!\n");
+    printf("compress_hdr_hc06: NH_C STILL ENABLED — ERROR!\n");
   }
 
   /* source address - cannot be multicast */
@@ -688,7 +688,7 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
     /* elide the prefix - indicate by CID and set context + SAC */
     PRINTF("IPHC: compressing src with context - setting CID & SAC ctx: %d\n",
 	   context->number);
-    //            CID/SAC     SSH TCP (port 22)
+    //  Отключаем CID/SAC для SSH TCP (port 22)
     if (UIP_IP_BUF->proto == UIP_PROTO_TCP && (UIP_TCP_BUF->destport == 0x1600 || UIP_TCP_BUF->srcport == 0x1600)) {
       printf("compress_hdr_hc06: SSH TCP (dest port 22) > skipping CID/SAC\n");
       //printf("compress_hdr_hc06: SSH TCP > skipping CID/SAC and context byte allocation\n");
@@ -714,13 +714,13 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
     hc06_ptr += 16;
   }
 
-  // <<<              (      source address,       dest address) <<<
+  // <<< ВСТАВЬ ЗДЕСЬ (после source address, перед dest address) <<<
   if (UIP_IP_BUF->proto == UIP_PROTO_TCP &&
       (UIP_TCP_BUF->destport == 0x1600 || UIP_TCP_BUF->srcport == 0x1600)) {
     iphc1 &= ~SICSLOWPAN_IPHC_CID;
     printf("compress_hdr_hc06: CID forced DISABLED at END for SSH TCP (port 22 in src/dst)\n");
   }
-  // ^^^               ^^^
+  // ^^^ КОНЕЦ ВСТАВКИ ^^^
 
   /* dest address*/
   if(uip_is_addr_mcast(&UIP_IP_BUF->destipaddr)) {
@@ -753,7 +753,7 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
     /* Address is unicast, try to compress */
     if((context = addr_context_lookup_by_prefix(&UIP_IP_BUF->destipaddr)) != NULL) {
       /* elide the prefix */
-      //            DAC     SSH
+      // Пропускаем DAC для SSH
       if (UIP_IP_BUF->proto == UIP_PROTO_TCP &&
           UIP_TCP_BUF->destport == 0x1600) {
         printf("compress_hdr_hc06: skipping DAC and context byte for SSH TCP (dest port 22)\n");
@@ -841,30 +841,30 @@ compress_hdr_hc06(linkaddr_t *link_destaddr)
   // hc06_ptr += SICSLOWPAN_NH_COMPRESSOR.compress(hc06_ptr, &uncomp_hdr_len);
 #endif
 
-  // <<<              (           ,                         ) <<<
-  //           CID              ,                                (source/dest context)
+  // <<< ВСТАВЬ ЗДЕСЬ (самый конец, перед записью заголовков) <<<
+  // Отключаем CID в самом конце, после ВСЕХ возможных включений (source/dest context)
 /*if (UIP_IP_BUF->proto == UIP_PROTO_TCP &&
       (UIP_TCP_BUF->destport == 0x1600 || UIP_TCP_BUF->srcport == 0x1600)) {
-    //                                    -    ,             
-    if (hc06_ptr > &PACKETBUF_IPHC_BUF[2]) {  //              1            iphc1
+    // Всегда проверяем и удаляем контекст-байт, если он есть
+    if (hc06_ptr > &PACKETBUF_IPHC_BUF[2]) {  // есть хотя бы 1 байт после iphc1
       printf("compress_hdr_hc06: SSH TCP > checking and removing context byte if present\n");
       printf("compress_hdr_hc06: SSH TCP > context byte present (value=0x%02x), removing it\n",
            PACKETBUF_IPHC_BUF[2]);
-      //                         [2]
+      // Удаляем байт на позиции [2]
       memmove(&PACKETBUF_IPHC_BUF[2], &PACKETBUF_IPHC_BUF[3], hc06_ptr - &PACKETBUF_IPHC_BUF[3]);
-      hc06_ptr--;  //                          
+      hc06_ptr--;  // уменьшаем длину заголовка
     }
     
     iphc1 &= ~SICSLOWPAN_IPHC_CID;
     printf("compress_hdr_hc06: FINAL CID DISABLED + context byte removed for SSH TCP (port 22)\n");
   }*/  
-  // <<<             (           ,                         ) <<<
+  // <<< ВСТАВЬ СЮДА (самый конец, перед записью заголовков) <<<
   if (UIP_IP_BUF->proto == UIP_PROTO_TCP &&
       (UIP_TCP_BUF->destport == 0x1600 || UIP_TCP_BUF->srcport == 0x1600)) {
     printf("compress_hdr_hc06: SSH TCP > FINAL forcing context byte to 0 (cleanup)\n");
-    PACKETBUF_IPHC_BUF[2] = 0;  //                                          
+    PACKETBUF_IPHC_BUF[2] = 0;  // окончательно обнуляем после всех операций
   }
-  // ^^^               ^^^
+  // ^^^ КОНЕЦ ВСТАВКИ ^^^
 
   printf("compress_hdr_hc06: final iphc0 = 0x%02x, iphc1 = 0x%02x (CID bit = %d)\n",
          iphc0, iphc1, (iphc1 & SICSLOWPAN_IPHC_CID) ? 1 : 0);
@@ -915,7 +915,7 @@ uncompress_hdr_hc06(uint16_t ip_len)
     hc06_ptr++;
   }
 
-  // <                      <
+  // < Добавь дамп на приёме <
   printf("uncompress_hdr_hc06: dump first 10 bytes on receive: ");
   for (int i = 0; i < 10; i++) {
     printf("%02x ", PACKETBUF_IPHC_BUF[i]);
@@ -978,23 +978,7 @@ uncompress_hdr_hc06(uint16_t ip_len)
     hc06_ptr += 1;
   }
 
-// ----------------------------------------------------------------
-  //                                    (      proto   TTL,           )
-  /*if (SICSLOWPAN_IP_BUF->proto == 0) {
-    //                                  (TCP                     IP)
-    uint16_t presumed_dport = uip_ntohs(*(uint16_t*)(hc06_ptr + 2));  // srcport + 2       = dport
-    if (presumed_dport == 22) {
-      printf("uncompress_hdr_hc06:         SSH (proto=0, presumed dport=22)                          0x%02x\n", *hc06_ptr);
-      hc06_ptr++;  //                        (                  )
-      //              proto
-      SICSLOWPAN_IP_BUF->proto = *hc06_ptr;
-      PRINTF("           proto = %d\n", SICSLOWPAN_IP_BUF->proto);
-      hc06_ptr += 1;
-    }
-  }*/
-// ----------------------------------------------------------------
-
-/*---                                           ----------------------*/
+/*--- Дополнительный лог для ранней диагностики ----------------------*/
 printf("uncompress_hdr_hc06: proto BEFORE addr uncompress = %d\n", SICSLOWPAN_IP_BUF->proto);
 /*--------------------------------------------------------------------*/
 
@@ -1145,7 +1129,7 @@ printf("uncompress_hdr_hc06: proto BEFORE addr uncompress = %d\n", SICSLOWPAN_IP
   }
 
 /* ----------------------------------------------------------------*/
- /*                                                    NEXT HEADER*/
+ /* ЭТОТ БЛОК ДОЛЖЕН БЫТЬ ЗДЕСЬ — ПОСЛЕ ВСЕЙ ОБРАБОТКИ NEXT HEADER*/
   printf("uncompress_hdr_hc06: FINAL proto after full decompression = %d  ", SICSLOWPAN_IP_BUF->proto);
   if (SICSLOWPAN_IP_BUF->proto == UIP_PROTO_TCP) {
     printf("TCP !!! dport = %u  flags = 0x%02x\n",
@@ -1770,23 +1754,8 @@ input(void)
   /* Save the RSSI of the incoming packet in case the upper layer will
      want to query us for it later. */
   last_rssi = (signed short)packetbuf_attr(PACKETBUF_ATTR_RSSI);
-
- // <                                       
-  printf("------------START sicslowpan_input-----------------------------------\n");
-  printf("sicslowpan_input:          ШЁ  len=%d RSSI=%d dBm from MAC=%02x%02x%02x%02x%02x%02x\n",
-         packetbuf_datalen(),
-         last_rssi,
-         packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[0],
-         packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[1],
-         packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[2],
-         packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[3],
-         packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[4],
-         packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[5]);
-
-  uint8_t dispatch = PACKETBUF_HC1_PTR[PACKETBUF_HC1_DISPATCH];
-  printf("sicslowpan_input: dispatch=0x%02x (IPHC      0x7x)\n", dispatch);
   
-  // =====                               =====
+  // ===== Вывод адресов до декомпрессии =====
   PRINTF("sicslowpan input: SRC-before: ");
   const uint8_t *sender = (const uint8_t *)packetbuf_addr(PACKETBUF_ADDR_SENDER);
   for(int i = 0; i < LINKADDR_SIZE; i++) {
@@ -1918,7 +1887,7 @@ input(void)
   /* Process next dispatch and headers */
 #if SICSLOWPAN_COMPRESSION == SICSLOWPAN_COMPRESSION_HC06
   if((PACKETBUF_HC1_PTR[PACKETBUF_HC1_DISPATCH] & 0xe0) == SICSLOWPAN_DISPATCH_IPHC) {
-    printf("sicslowpan_input: IPHC            uncompress_hdr_hc06\n");
+    PRINTFI("sicslowpan input: IPHC\n");
     uncompress_hdr_hc06(frag_size);
   } else
 #endif /* SICSLOWPAN_COMPRESSION == SICSLOWPAN_COMPRESSION_HC06 */
@@ -1947,7 +1916,7 @@ input(void)
       return;
   }
 
-  // =====                                  =====
+  // ===== Вывод адресов после декомпрессии =====
   PRINTF("sicslowpan input: SRC-after: ");
   for(int i = 0; i < 16; i++) {
     PRINTF("%02x", UIP_IP_BUF->srcipaddr.u8[i]);
@@ -2047,7 +2016,6 @@ input(void)
 
     tcpip_input();
     check_for_tcp_syn();
-    printf("------------END sicslowpan_input-----------------------------------\n");
 #if SICSLOWPAN_CONF_FRAG
   }
 #endif /* SICSLOWPAN_CONF_FRAG */
