@@ -309,48 +309,70 @@ PROCESS_THREAD(border_router_process, ev, data)
   static struct etimer et;
 
   PROCESS_BEGIN();
+  printf("DEBUG: border_router_process START\n");
   prefix_set = 0;
 
   PROCESS_PAUSE();
+  printf("DEBUG: After PROCESS_PAUSE\n");
 
   PRINTF("RPL-Border router started\n");
 
+  printf("DEBUG: Calling slip_config_handle_arguments\n");
   slip_config_handle_arguments(contiki_argc, contiki_argv);
+  printf("DEBUG: slip_config_ipaddr = %s\n",
+         slip_config_ipaddr ? slip_config_ipaddr : "NULL");
 
+  printf("DEBUG: Initializing TUN interface\n");
   /* tun init is also responsible for setting up the SLIP connection */
   tun_init();
 
+  printf("DEBUG: Waiting for MAC from slip-radio\n");
   while(!mac_set) {
     etimer_set(&et, CLOCK_SECOND);
+    printf("DEBUG: Requesting MAC...\n");
     request_mac();
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
   }
 
+  printf("DEBUG: MAC received from slip-radio\n");
+
   if(slip_config_ipaddr != NULL) {
     uip_ipaddr_t prefix;
+
+    printf("DEBUG: Converting IP prefix: %s\n", slip_config_ipaddr);
 
     if(uiplib_ipaddrconv((const char *)slip_config_ipaddr, &prefix)) {
       PRINTF("Setting prefix ");
       PRINT6ADDR(&prefix);
       PRINTF("\n");
+
+      printf("DEBUG: Calling set_prefix_64\n");
+
       set_prefix_64(&prefix);
     } else {
       PRINTF("Parse error: %s\n", slip_config_ipaddr);
       exit(0);
     }
+  } else {
+    printf("ERROR: slip_config_ipaddr is NULL\n");
   }
 
 #if DEBUG
   print_local_addresses();
 #endif
 
+  printf("DEBUG: Turning MAC always ON\n");
+
   /* The border router runs with a 100% duty cycle in order to ensure high
      packet reception rates. */
   NETSTACK_MAC.off(1);
 
+  printf("DEBUG: Entering main loop\n");
+
   while(1) {
     etimer_set(&et, CLOCK_SECOND * 2);
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
+    printf("DEBUG: border-router alive\n");
     /* do anything here??? */
   }
 

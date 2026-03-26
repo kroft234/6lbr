@@ -189,6 +189,9 @@ vpath %.S $(SOURCEDIRS)
 
 CFLAGS += ${addprefix -I,$(SOURCEDIRS) $(CONTIKI)}
 
+###Добавленная часть
+CFLAGS += -I$(CONTIKI)/examples/6lbr
+
 ### Check for a git repo and pass version if found
 ### git.exe in Windows cmd shells may require no stderr redirection
 ifndef RELSTR

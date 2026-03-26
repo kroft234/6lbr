@@ -67,63 +67,84 @@ int
 slip_config_handle_arguments(int argc, char **argv)
 {
   const char *prog;
-  char c;
+  int c;
   int baudrate = 115200;
+
+  printf("DEBUG: slip_config_handle_arguments() called\n");
+  for(int i = 0; i < argc; i++) {
+    printf("DEBUG: argv[%d] = %s\n", i, argv[i]);
+  }
 
   slip_config_verbose = 0;
 
   prog = argv[0];
+  printf("DEBUG: program name = %s\n", prog);
   while((c = getopt(argc, argv, "B:H:D:Lhs:t:v::d::a:p:T")) != -1) {
+
+    printf("DEBUG: getopt returned option '%c' (code %d)\n", c, c);
+
     switch(c) {
     case 'B':
+      printf("DEBUG: baudrate argument = %s\n", optarg);
       baudrate = atoi(optarg);
       break;
 
     case 'H':
+      printf("DEBUG: hardware flow control enabled\n");
       slip_config_flowcontrol = 1;
       break;
 
     case 'L':
+      printf("DEBUG: timestamp logging enabled\n");
       slip_config_timestamp = 1;
       break;
 
     case 's':
+      printf("DEBUG: serial device raw = %s\n", optarg);
       if(strncmp("/dev/", optarg, 5) == 0) {
 	slip_config_siodev = optarg + 5;
       } else {
 	slip_config_siodev = optarg;
       }
+      printf("DEBUG: parsed serial device = %s\n", slip_config_siodev);
       break;
 
     case 't':
+      printf("DEBUG: TUN device raw = %s\n", optarg);
       if(strncmp("/dev/", optarg, 5) == 0) {
 	strncpy(slip_config_tundev, optarg + 5, sizeof(slip_config_tundev));
       } else {
 	strncpy(slip_config_tundev, optarg, sizeof(slip_config_tundev));
       }
+      printf("DEBUG: parsed TUN device = %s\n", slip_config_tundev);
       break;
 
     case 'a':
+      printf("DEBUG: TCP host = %s\n", optarg);
       slip_config_host = optarg;
       break;
 
     case 'p':
+      printf("DEBUG: TCP port = %s\n", optarg);
       slip_config_port = optarg;
       break;
 
     case 'd':
       slip_config_basedelay = 10;
       if(optarg) slip_config_basedelay = atoi(optarg);
+      printf("DEBUG: slip delay = %d\n", slip_config_basedelay);
       break;
 
     case 'v':
       slip_config_verbose = 2;
       if(optarg) slip_config_verbose = atoi(optarg);
+      printf("DEBUG: verbosity level = %d\n", slip_config_verbose);
       break;
 
     case '?':
     case 'h':
     default:
+printf("DEBUG: unknown option encountered\n");
 fprintf(stderr,"usage:  %s [options] ipaddress\n", prog);
 fprintf(stderr,"example: border-router.native -L -v2 -s ttyUSB1 aaaa::1/64\n");
 fprintf(stderr,"Options are:\n");
@@ -153,13 +174,28 @@ exit(1);
       break;
     }
   }
+
+  printf("DEBUG: getopt finished\n");
+  printf("DEBUG: optind = %d\n", optind);
+
   argc -= optind - 1;
   argv += optind - 1;
 
+  printf("DEBUG: argc after parsing = %d\n", argc);
+
+  for(int i = 0; i < argc; i++) {
+    printf("DEBUG: remaining argv[%d] = %s\n", i, argv[i]);
+  }
+
   if(argc != 2 && argc != 3) {
+    printf("DEBUG: invalid argc, expecting ipaddress argument\n");
     err(1, "usage: %s [-B baudrate] [-H] [-L] [-s siodev] [-t tundev] [-T] [-v verbosity] [-d delay] [-a serveraddress] [-p serverport] ipaddress", prog);
   }
   slip_config_ipaddr = argv[1];
+
+  printf("DEBUG: parsed IPv6 prefix = %s\n", slip_config_ipaddr);
+
+  printf("DEBUG: selected baudrate = %d\n", baudrate);
 
   switch(baudrate) {
   case -2:
@@ -185,14 +221,23 @@ exit(1);
     break;
 #endif
   default:
+    printf("DEBUG: unknown baudrate error\n");
     err(1, "unknown baudrate %d", baudrate);
     break;
   }
 
+  printf("DEBUG: final serial device = %s\n",
+         slip_config_siodev ? slip_config_siodev : "NULL");
+
+  printf("DEBUG: final TUN device = %s\n", slip_config_tundev);
+
   if(*slip_config_tundev == '\0') {
     /* Use default. */
     strcpy(slip_config_tundev, "tun0");
+    printf("DEBUG: default TUN device applied: tun0\n");
   }
+  printf("DEBUG: slip_config_handle_arguments finished successfully\n");
+
   return 1;
 }
 /*---------------------------------------------------------------------------*/

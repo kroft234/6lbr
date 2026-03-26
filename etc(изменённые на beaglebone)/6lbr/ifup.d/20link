@@ -1,0 +1,67 @@
+#!/bin/sh
+# 20link — корректный ifup для 6LBR (НЕ ЛОМАЕТ ЗАПУСК)
+
+# НИКАКОГО set -e !!!
+# 6lbr-ifup не имеет права падать
+
+. $CETIC_6LBR_CONF
+. $1/6lbr-functions
+
+config_default
+
+MODE_6LBR=$2
+DEV=$3
+OS=`uname`
+
+[ "$MODE_6LBR" != "tap" ] && exit 0
+
+case $OS in
+Linux)
+    echo "20link: bringing up TAP $DEV"
+
+    # Поднимаем интерфейс
+    if [ "$DEV_TAP_MAC" != "-" ]; then
+        ip link set "$DEV" down 2>/dev/null || true
+        ip link set "$DEV" address "$DEV_TAP_MAC" 2>/dev/null || true
+    fi
+    ip link set "$DEV" up 2>/dev/null || true
+
+    # --------------------------------------------------
+    # IPv6 Contiki — ОПЦИОНАЛЬНО, НЕ КРИТИЧНО
+    # --------------------------------------------------
+    IPV6_FILE="/var/log/6lbr.ip"
+
+    if [ -s "$IPV6_FILE" ]; then
+        CONTIKI_IP=$(cat "$IPV6_FILE")
+
+        if [ -n "$CONTIKI_IP" ] && [ "$CONTIKI_IP" != "::" ]; then
+            echo "20link: assigning Contiki IPv6 $CONTIKI_IP"
+
+            ip -6 addr add "$CONTIKI_IP/64" dev "$DEV" 2>/dev/null || true
+            ip -6 route add aaaa::/64 dev "$DEV" 2>/dev/null || true
+        else
+            echo "20link: IPv6 not ready yet ($CONTIKI_IP)"
+        fi
+    else
+        echo "20link: no Contiki IPv6 file yet"
+    fi
+
+    echo "20link: TAP ready"
+    exit 0
+    ;;
+
+Darwin)
+    if [ "$DEV_TAP_MAC" != "-" ]; then
+        ifconfig "$DEV" link "$DEV_TAP_MAC"
+    fi
+    ifconfig "$DEV" inet6 up
+    exit 0
+    ;;
+
+*)
+    echo "20link: unknown OS"
+    exit 0
+    ;;
+esac
+
+

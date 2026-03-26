@@ -894,13 +894,33 @@ dao_output_target(rpl_parent_t *parent, uip_ipaddr_t *prefix, uint8_t lifetime)
 #endif /* RPL_DAO_SPECIFY_DAG */
 
   /* create target subopt */
-  prefixlen = sizeof(*prefix) * CHAR_BIT;
+  //prefixlen = sizeof(*prefix) * CHAR_BIT;
+  prefixlen = 124;
+
+  int prefix_bytes = (prefixlen + 7) / 8;
+
   buffer[pos++] = RPL_OPTION_TARGET;
-  buffer[pos++] = 2 + ((prefixlen + 7) / CHAR_BIT);
-  buffer[pos++] = 0; /* reserved */
+  buffer[pos++] = 2 + prefix_bytes;
+  buffer[pos++] = 0;
   buffer[pos++] = prefixlen;
-  memcpy(buffer + pos, prefix, (prefixlen + 7) / CHAR_BIT);
-  pos += ((prefixlen + 7) / CHAR_BIT);
+
+  /* копируем */
+  memcpy(buffer + pos, prefix, prefix_bytes);
+
+  /* ќЅЌ”Ћя≈ћ хвостовые биты */
+  if(prefixlen % 8 != 0) {
+    uint8_t mask = 0xFF << (8 - (prefixlen % 8));
+    buffer[pos + prefix_bytes - 1] &= mask;
+  }
+
+  /* DEBUG */
+  printf("DAO send prefixlen: %u\n", prefixlen);
+  printf("DAO send prefix: ");
+  PRINT6ADDR(prefix);
+  printf("\n");
+  PRINTF("DAO RAW last byte: %02x\n", buffer[pos + prefix_bytes - 1]);
+
+  pos += prefix_bytes;
 
   /* Create a transit information sub-option. */
   buffer[pos++] = RPL_OPTION_TRANSIT;

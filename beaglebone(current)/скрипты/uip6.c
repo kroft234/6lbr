@@ -90,8 +90,7 @@
 /* For Debug, logging, statistics                                            */
 /*---------------------------------------------------------------------------*/
 
-/*#define DEBUG DEBUG_NONE*/
-#define DEBUG DEBUG_PRINT
+#define DEBUG DEBUG_NONE
 #include "net/ip/uip-debug.h"
 
 #if UIP_CONF_IPV6_RPL
@@ -2268,18 +2267,6 @@ uip_process(uint8_t flag)
      headers before calculating the checksum and finally send the
      packet. */
  tcp_send:
-/*----------------------------------------------*/
-  // перед тем как формируется финальный пакет
-  check_nat_reverse();
-/*----------------------------------------------*/
-
-  PRINTF("TCP packet outgoing: ");
-  PRINTF("SRC: ");
-  PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
-  PRINTF(" -> DST: ");
-  PRINT6ADDR(&UIP_IP_BUF->destipaddr);
-  PRINTF("\n");
-
   PRINTF("In tcp_send\n");
    
   UIP_TCP_BUF->ackno[0] = uip_connr->rcv_nxt[0];
@@ -2297,13 +2284,11 @@ uip_process(uint8_t flag)
 
   uip_ipaddr_copy(&UIP_IP_BUF->destipaddr, &uip_connr->ripaddr);
   uip_ds6_select_src(&UIP_IP_BUF->srcipaddr, &UIP_IP_BUF->destipaddr);
-  PRINTF("-----------TCP_SEND-----------\n");
   PRINTF("Sending TCP packet to ");
   PRINT6ADDR(&UIP_IP_BUF->destipaddr);
   PRINTF(" from ");
   PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
   PRINTF("\n");
-  PRINTF("-----------TCP_SEND-----------\n");
 
   if(uip_connr->tcpstateflags & UIP_STOPPED) {
     /* If the connection has issued uip_stop(), we advertise a zero
@@ -2315,13 +2300,6 @@ uip_process(uint8_t flag)
   }
 
  tcp_send_noconn:
-/*--------------------------*/
-  // NAT тут
-  check_nat_reverse();
-/*--------------------------*/
-
-  PRINTF("In tcp_send_noconn\n");
-
   UIP_IP_BUF->proto = UIP_PROTO_TCP;
 
   UIP_IP_BUF->ttl = uip_ds6_if.cur_hop_limit;
@@ -2345,16 +2323,16 @@ uip_process(uint8_t flag)
  send:
   PRINTF("Sending packet with length %d (%d)\n", uip_len,
          (UIP_IP_BUF->len[0] << 8) | UIP_IP_BUF->len[1]);
-  /*printf("Sending packet with length %d (%d)\n", uip_len,
+  printf("Sending packet with length %d (%d)\n", uip_len,
          (UIP_IP_BUF->len[0] << 8) | UIP_IP_BUF->len[1]);
 
 
-   NAT reverse только для TCP
+  // NAT reverse только для TCP
   #if UIP_TCP
   if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
       check_nat_reverse();
   }
-  #endif*/
+  #endif
   
   UIP_STAT(++uip_stat.ip.sent);
   /* Return and let the caller do the actual transmission. */

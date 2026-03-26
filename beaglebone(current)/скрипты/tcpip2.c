@@ -284,80 +284,14 @@ start_periodic_tcp_timer(void)
   }
 }
 /*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
-/* Получить РЕАЛЬНЫЙ протокол (TCP/UDP/ICMP), учитывая extension headers */
-uint8_t get_real_proto(void)
-{
-  uint8_t *nexthdr = &UIP_IP_BUF->proto;
-  uint16_t ext_len = 0;
-
-  PRINTF("[PROTO] Start proto = %u\n", *nexthdr);
-
-  while(1) {
-    PRINTF("[PROTO] Inspect header = %u, ext_len = %u\n", *nexthdr, ext_len);
-
-    switch(*nexthdr) {
-
-      case UIP_PROTO_HBHO:
-        PRINTF("[PROTO] HBH header\n");
-        break;
-
-      case UIP_PROTO_DESTO:
-        PRINTF("[PROTO] DESTO header\n");
-        break;
-
-      case UIP_PROTO_ROUTING:
-        PRINTF("[PROTO] ROUTING header\n");
-        break;
-
-      case UIP_PROTO_FRAG:
-        PRINTF("[PROTO] FRAG header\n");
-        break;
-
-      case UIP_PROTO_NONE:
-        PRINTF("[PROTO] NONE header -> stop\n");
-        return UIP_PROTO_NONE;
-
-      default:
-        PRINTF("[PROTO] FINAL proto = %u\n", *nexthdr);
-        return *nexthdr;
-    }
-
-    struct uip_ext_hdr *ext = (struct uip_ext_hdr *)
-      &uip_buf[UIP_LLH_LEN + UIP_IPH_LEN + ext_len];
-
-    PRINTF("[PROTO] ext->next = %u, ext->len = %u\n", ext->next, ext->len);
-
-    nexthdr = &ext->next;
-    ext_len += (ext->len << 3) + 8;
-  }
-}
-/*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
 /* FORWARD NAT: любой TCP-пакет на порт 22 > переписываем dst aaaa:: > bbbb:: */
 void check_for_tcp_syn(void)
 {
-
-  uint8_t proto = get_real_proto();
-  PRINTF("[DEBUG] get_real_proto = %u\n", proto);
-  if (proto != UIP_PROTO_TCP) {
-    PRINTF("[CHECK] Not TCP, skip\n");
+  if (UIP_IP_BUF->proto != UIP_PROTO_TCP) {
     return;
   }
-  PRINTF("[CHECK] TCP detected!\n");
 
-  printf("DBG: TCP destport raw = 0x%04x, ntohs = %u\n",
-       UIP_TCP_BUF->destport, uip_ntohs(UIP_TCP_BUF->destport));
-  // новый вариант: учитываем ext-header
-  uint8_t ext_len = uip_ext_len; // длина ext-header, которая уже вычисляется в tcpip_input
-  struct uip_tcpip_hdr *tcp = (struct uip_tcpip_hdr *)(uip_buf + UIP_LLH_LEN + ext_len);
-  uint16_t dst_port = uip_ntohs(tcp->destport);
-  printf("DBG_new: TCP destport raw = 0x%04x, ntohs = %u\n",
-       UIP_TCP_BUF->destport, uip_ntohs(UIP_TCP_BUF->destport));
-
-  //uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
+  uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
   if (dst_port != SSH_PORT) {
     return;
   }
@@ -368,7 +302,7 @@ void check_for_tcp_syn(void)
   printf("srcport=%u dstport=%u flags=0x%02x\n",
          uip_ntohs(UIP_TCP_BUF->srcport), dst_port, UIP_TCP_BUF->flags);
 
-  // --- NAT TABLE (Ищем свободный слот в NAT) ---
+  // --- NAT TABLE ---
   struct nat_entry *e = NULL;
   for (int i = 0; i < NAT_TABLE_SIZE; i++) {
     if (!nat_table[i].valid) {
@@ -376,7 +310,6 @@ void check_for_tcp_syn(void)
       break;
     }
   }
- // если нет места — переписываем 0
   if (!e) {
     printf("NAT table full > overwrite slot 0\n");
     e = &nat_table[0];
@@ -388,8 +321,8 @@ void check_for_tcp_syn(void)
   e->new_dst_port = SSH_PORT;
   e->valid = 1;
 
-  // --- НОВЫЙ DST---
-  uip_ip6addr(&e->new_dst, 0xbbbb, 0, 0, 0, 0x212, 0x4b00, 0x40e, 0xfa83);
+  // --- НОВЫЙ DST = aaaa::1 ---
+  uip_ip6addr(&e->new_dst, 0xaaaa, 0, 0, 0, 0, 0, 0, 1);
 
   // переписываем пакет
   uip_ip6addr_copy(&UIP_IP_BUF->destipaddr, &e->new_dst);
@@ -404,6 +337,10 @@ void check_for_tcp_syn(void)
   print_ip6("", &UIP_IP_BUF->destipaddr);
   printf("TCP checksum after: 0x%04x\n",
          uip_ntohs(UIP_TCP_BUF->tcpchksum));
+
+  // ВАЖНО: ничего больше не делаем!
+  // НЕ вызываем slip_send()
+  // НЕ обнуляем uip_len
 }
 /*---------------------------------------------------------------------------*/
 
@@ -427,11 +364,9 @@ void check_nat_reverse(void)
     if (!nat_table[i].valid) continue;
 
     // Матчим по: src == сохранённый сервер (new_dst) И dst_port == оригинальный клиентский порт
-    if(uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr, &nat_table[i].new_dst) &&
-           src_port == nat_table[i].new_dst_port &&
-           uip_ip6addr_cmp(&UIP_IP_BUF->destipaddr, &nat_table[i].orig_src) &&
-           dst_port == nat_table[i].orig_src_port)
-     {
+    if (uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr, &nat_table[i].new_dst) &&
+        dst_port == nat_table[i].orig_src_port) {
+
       printf(">>> REVERSE NAT MATCH slot %d <<<\n", i);
       print_ip6("Restoring src to original client: ", &nat_table[i].orig_src);
 
@@ -461,21 +396,21 @@ packet_input(void)
 
 #if UIP_CONF_IP_FORWARD
 
-  PRINTF("\n=============================\n");
-  PRINTF("=== PACKET_INPUT START ===\n");
-  PRINTF("uip_len = %u\n", uip_len);
+  print("\n=============================\n");
+  print("=== PACKET_INPUT START ===\n");
+  print("uip_len = %u\n", uip_len);
 
   if(uip_len > 0) {
 
-    PRINTF("Next header (proto) = %u\n", UIP_IP_BUF->proto);
-    PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
-    PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+    print("Next header (proto) = %u\n", UIP_IP_BUF->proto);
+    print("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
+    print("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
     if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
-      PRINTF("TCP SRC port = %u\n", uip_ntohs(UIP_TCP_BUF->srcport));
-      PRINTF("TCP DST port = %u\n", uip_ntohs(UIP_TCP_BUF->destport));
-      PRINTF("TCP flags = 0x%02x\n", UIP_TCP_BUF->flags);
-      PRINTF("TCP checksum = 0x%04x\n",
+      print("TCP SRC port = %u\n", uip_ntohs(UIP_TCP_BUF->srcport));
+      print("TCP DST port = %u\n", uip_ntohs(UIP_TCP_BUF->destport));
+      print("TCP flags = 0x%02x\n", UIP_TCP_BUF->flags);
+      print("TCP checksum = 0x%04x\n",
              uip_ntohs(UIP_TCP_BUF->tcpchksum));
     }
 
@@ -490,24 +425,26 @@ packet_input(void)
 
       tcpip_is_forwarding = 0;
 
-      PRINTF("--- BEFORE NAT ---\n");
-      PRINTF("DST before: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+      print("--- BEFORE NAT ---\n");
+      print("DST before: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
       check_for_tcp_syn();
-      PRINTF("--- AFTER NAT ---\n");
-      PRINTF("DST after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+      print("--- AFTER NAT ---\n");
+      print("DST after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
-      // Проверяем, SSH ли пакет
-      if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
-         uip_ntohs(UIP_TCP_BUF->destport) == 22) {
+     /* ВСТАВИТЬ ВОТ ЭТО */
+     if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
 
-      // Forward на Linux
-      tapdev_send();
+     uint16_t dport = uip_ntohs(UIP_TCP_BUF->destport);
 
-      uip_len = 0; // пакет обработан
-      tcpip_is_forwarding = 0;
-      return;
-      }
+     if(dport == 22) { // SSH
+
+       PRINTF("FORWARD TO LINUX via tapdev_send()\n");
+       tapdev_send();   // ?? отправка в Linux
+       return;          // ? КРИТИЧНО: не идём дальше в стек
+       }
+     }
+     /* ДО СЮДА */
 
       print("Calling uip_input()\n");
       uip_input();
@@ -517,15 +454,15 @@ packet_input(void)
       if(uip_len > 0) {
 
 #if UIP_CONF_TCP_SPLIT
-        PRINTF("uip_split_output()\n");
+        print("uip_split_output()\n");
         uip_split_output();
 #else
 
 #if NETSTACK_CONF_WITH_IPV6
-        PRINTF("tcpip_ipv6_output()\n");
+        print("tcpip_ipv6_output()\n");
         tcpip_ipv6_output();
 #else
-        PRINTF("tcpip_output(), len=%d\n", uip_len);
+        print("tcpip_output(), len=%d\n", uip_len);
         tcpip_output();
 #endif
 
@@ -540,39 +477,22 @@ packet_input(void)
 
   if(uip_len > 0) {
 
-    PRINTF("\n=== PACKET_INPUT (NO FORWARD) ===\n");
-    /*PRINTF("uip_len = %u\n", uip_len);
-    PRINTF("proto = %u\n", UIP_IP_BUF->proto);
+    /*print("\n=== PACKET_INPUT (NO FORWARD) ===\n");
+    print("uip_len = %u\n", uip_len);
+    print("proto = %u\n", UIP_IP_BUF->proto);
 
     if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
-      PRINTF("TCP DST port = %u\n",
+      print("TCP DST port = %u\n",
              uip_ntohs(UIP_TCP_BUF->destport));
-      PRINTF("TCP flags = 0x%02x\n",
+      print("TCP flags = 0x%02x\n",
              UIP_TCP_BUF->flags);
     }*/
 
     check_for_tcp_syn();
-
-  // --- ТВОЙ FORWARD ---
-  if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
-     uip_ntohs(UIP_TCP_BUF->destport) == 22) {
-
-    PRINTF(">>> MANUAL FORWARD TO TAP <<<\n");
-
-    PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
-    PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
-
-    tapdev_send();
-
-    uip_len = 0;   // ОЧЕНЬ ВАЖНО
-    return;
-  }
-
-     // --- обычная обработка ---
-    /*PRINTF("Calling uip_input()\n");*/
+    /*print("Calling uip_input()\n");*/
     uip_input();
 
-    /*PRINTF("After uip_input(), uip_len=%u\n", uip_len);*/
+    /*print("After uip_input(), uip_len=%u\n", uip_len);*/
 
     if(uip_len > 0) {
 
@@ -588,10 +508,9 @@ packet_input(void)
     }
   }
 
-PRINTF("=== PACKET_INPUT END ===\n");
 #endif
 
-  /*PRINTF("=== PACKET_INPUT END ===\n");*/
+  /*print("=== PACKET_INPUT END ===\n");*/
 }
 /*---------------------------------------------------------------------------*/
 #if UIP_TCP
