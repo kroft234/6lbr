@@ -876,7 +876,25 @@ ext_hdr_options_process(void)
   * length field in an option : the length of data in the option
   */
   uip_ext_opt_offset = 2;
+
+  PRINTF("\n=== EXT HDR OPTIONS START ===\n");
+  PRINTF("EXT_HDR total len(bytes) = %u\n", ((UIP_EXT_BUF->len << 3) + 8));
+  PRINTF("Initial offset = %u\n", uip_ext_opt_offset);
+
   while(uip_ext_opt_offset < ((UIP_EXT_BUF->len << 3) + 8)) {
+
+    PRINTF("\n--- OPTION ITERATION ---\n");
+    PRINTF("Current offset = %u\n", uip_ext_opt_offset);
+
+    /* Лог всех полей текущей опции */
+    PRINTF("OPT TYPE = 0x%02x\n", UIP_EXT_HDR_OPT_BUF->type);
+    PRINTF("OPT LEN  = %u\n", UIP_EXT_HDR_OPT_BUF->len);
+
+    /* Если это PADN — у него своё поле длины */
+    if(UIP_EXT_HDR_OPT_BUF->type == UIP_EXT_HDR_OPT_PADN) {
+      PRINTF("PADN opt_len = %u\n", UIP_EXT_HDR_OPT_PADN_BUF->opt_len);
+    }
+
     switch(UIP_EXT_HDR_OPT_BUF->type) {
       /*
        * for now we do not support any options except padding ones
@@ -885,11 +903,17 @@ ext_hdr_options_process(void)
        */
       case UIP_EXT_HDR_OPT_PAD1:
         PRINTF("Processing PAD1 option\n");
+        PRINTF("Offset before = %u\n", uip_ext_opt_offset);
+
         uip_ext_opt_offset += 1;
+        PRINTF("Offset after  = %u\n", uip_ext_opt_offset);
         break;
       case UIP_EXT_HDR_OPT_PADN:
         PRINTF("Processing PADN option\n");
+        PRINTF("Offset before = %u\n", uip_ext_opt_offset);
+
         uip_ext_opt_offset += UIP_EXT_HDR_OPT_PADN_BUF->opt_len + 2;
+        PRINTF("Offset after  = %u\n", uip_ext_opt_offset);
         break;
       case UIP_EXT_HDR_OPT_RPL:
 		/* Fixes situation when a node that is not using RPL
@@ -902,12 +926,16 @@ ext_hdr_options_process(void)
 		 */
 #if UIP_CONF_IPV6_RPL
         PRINTF("Processing RPL option\n");
+        PRINTF("Offset before = %u\n", uip_ext_opt_offset);
         if(rpl_verify_header(uip_ext_opt_offset)) {
           PRINTF("RPL Option Error: Dropping Packet\n");
           return 1;
         }
 #endif /* UIP_CONF_IPV6_RPL */
         uip_ext_opt_offset += (UIP_EXT_HDR_OPT_BUF->len) + 2;
+        PRINTF("Offset after RPL = %u\n", uip_ext_opt_offset);
+        PRINTF("Returning 0 (continue next header)\n");
+
         return 0;
       default:
         /*
@@ -923,26 +951,40 @@ ext_hdr_options_process(void)
          *   Problem, Code 2, message to the packet's Source Address,
          *   pointing to the unrecognized Option Type.
          */
+        PRINTF("Unknown option, TYPE=0x%02x\n", UIP_EXT_HDR_OPT_BUF->type);
+        PRINTF("MSB check = 0x%02x\n", UIP_EXT_HDR_OPT_BUF->type & 0xC0);
         PRINTF("MSB %x\n", UIP_EXT_HDR_OPT_BUF->type);
         switch(UIP_EXT_HDR_OPT_BUF->type & 0xC0) {
           case 0:
+          PRINTF("Action: skip option\n");
             break;
           case 0x40:
+           PRINTF("Action: discard packet (return 1), offset=%u\n", uip_ext_opt_offset);
             return 1;
           case 0xC0:
+            PRINTF("Action: discard if multicast\n");
             if(uip_is_addr_mcast(&UIP_IP_BUF->destipaddr)) {
+              PRINTF("Destination is multicast -> return 1\n");
               return 1;
             }
           case 0x80:
+            PRINTF("Action: send ICMP error, offset=%u\n", uip_ext_opt_offset);
+
             uip_icmp6_error_output(ICMP6_PARAM_PROB, ICMP6_PARAMPROB_OPTION,
                              (uint32_t)UIP_IPH_LEN + uip_ext_len + uip_ext_opt_offset);
             return 2;
         }
+
+        PRINTF("Offset before = %u\n", uip_ext_opt_offset);
+
         /* in the cases were we did not discard, update ext_opt* */
         uip_ext_opt_offset += UIP_EXT_HDR_OPT_BUF->len + 2;
+        PRINTF("Offset after  = %u\n", uip_ext_opt_offset);
         break;
     }
   }
+
+  PRINTF("\n=== EXT HDR OPTIONS END === offset=%u\n", uip_ext_opt_offset);
   return 0;
 }
 
@@ -1170,20 +1212,26 @@ uip_process(uint8_t flag)
   uip_ext_len = 0;
   uip_ext_bitmap = 0;
   if(*uip_next_hdr == UIP_PROTO_HBHO) {
+
+  PRINTF("Before ext_hdr_options_process, offset=%u\n", uip_ext_opt_offset);
+
 #if UIP_CONF_IPV6_CHECKS
     uip_ext_bitmap |= UIP_EXT_HDR_BITMAP_HBHO;
 #endif /* UIP_CONF_IPV6_CHECKS */
     switch(ext_hdr_options_process()) {
       case 0:
+      PRINTF("After ext_hdr_options_process, offset=%u\n", uip_ext_opt_offset);
         /* continue */
         uip_next_hdr = &UIP_EXT_BUF->next;
         uip_ext_len += (UIP_EXT_BUF->len << 3) + 8;
         break;
       case 1:
+     PRINTF("Drop after ext hdr, offset=%u\n", uip_ext_opt_offset);
 	PRINTF("Dropping packet after extension header processing\n");
         /* silently discard */
         goto drop;
       case 2:
+      PRINTF("ICMP error after ext hdr, offset=%u\n", uip_ext_opt_offset);
 	PRINTF("Sending error message after extension header processing\n");
         /* send icmp error message (created in ext_hdr_options_process)
          * and discard*/
@@ -1319,6 +1367,7 @@ uip_process(uint8_t flag)
         goto icmp6_input;
       case UIP_PROTO_HBHO:
         PRINTF("Processing hbh header\n");
+        PRINTF("Before ext_hdr_options_process hbh, offset=%u\n", uip_ext_opt_offset);
         /* Hop by hop option header */
 #if UIP_CONF_IPV6_CHECKS
         /* Hop by hop option header. If we saw one HBH already, drop */
@@ -1330,14 +1379,17 @@ uip_process(uint8_t flag)
 #endif /*UIP_CONF_IPV6_CHECKS*/
         switch(ext_hdr_options_process()) {
           case 0:
+           PRINTF("After ext_hdr_options_process hbh, offset=%u\n", uip_ext_opt_offset);
             /*continue*/
             uip_next_hdr = &UIP_EXT_BUF->next;
             uip_ext_len += (UIP_EXT_BUF->len << 3) + 8;
             break;
           case 1:
+           PRINTF("Drop after ext hdr hbh, offset=%u\n", uip_ext_opt_offset);
             /*silently discard*/
             goto drop;
           case 2:
+            PRINTF("ICMP error after ext hdr hbh, offset=%u\n", uip_ext_opt_offset);
             /* send icmp error message (created in ext_hdr_options_process)
              * and discard*/
             goto send;
@@ -1347,6 +1399,7 @@ uip_process(uint8_t flag)
 #if UIP_CONF_IPV6_CHECKS
         /* Destination option header. if we saw two already, drop */
         PRINTF("Processing desto header\n");
+        PRINTF("Before ext_hdr_options_process desto, offset=%u\n", uip_ext_opt_offset);
         if(uip_ext_bitmap & UIP_EXT_HDR_BITMAP_DESTO1) {
           if(uip_ext_bitmap & UIP_EXT_HDR_BITMAP_DESTO2) {
             goto bad_hdr;
@@ -1359,14 +1412,17 @@ uip_process(uint8_t flag)
 #endif /*UIP_CONF_IPV6_CHECKS*/
         switch(ext_hdr_options_process()) {
           case 0:
+ 	    PRINTF("After ext_hdr_options_process desto, offset=%u\n", uip_ext_opt_offset);
             /*continue*/
             uip_next_hdr = &UIP_EXT_BUF->next;
             uip_ext_len += (UIP_EXT_BUF->len << 3) + 8;
             break;
           case 1:
+           PRINTF("Drop after ext hdr desto, offset=%u\n", uip_ext_opt_offset);
             /*silently discard*/
             goto drop;
           case 2:
+            PRINTF("ICMP error after ext hdr desto, offset=%u\n", uip_ext_opt_offset);
             /* send icmp error message (created in ext_hdr_options_process)
              * and discard*/
             goto send;

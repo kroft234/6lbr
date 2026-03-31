@@ -911,6 +911,10 @@ printf("offset+4 : %02x\n", hc06_ptr[4]);
 
 printf("====== END TF/FL DEBUG ======\n\n");
 
+printf("[NH_DEBUG] hc06_ptr offset BEFORE NH = %ld\n", hc06_ptr - packetbuf_ptr);
+printf("[NH_DEBUG] next header candidate = %02x\n", *hc06_ptr);
+printf("[NH_DEBUG] next+1 = %02x\n", *(hc06_ptr+1));
+
 /* Next Header */
 if((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
     /* Next header is carried inline */
@@ -1077,30 +1081,40 @@ printf("uncompress_hdr_hc06: proto BEFORE addr uncompress = %d\n", SICSLOWPAN_IP
 #endif
   }
 
-  /* ===================================================== */
-  /* ===== FINAL FIX: корректный proto как в uip ===== */
-  /* ===================================================== */
 
-  if(SICSLOWPAN_IP_BUF->proto == UIP_PROTO_HBHO ||   /* 0 */
-     SICSLOWPAN_IP_BUF->proto == UIP_PROTO_ROUTING ||/* 43 */
-     SICSLOWPAN_IP_BUF->proto == UIP_PROTO_DESTO) {  /* 60 */
+/* ===================================================== */
+/* ===== REAL PROTO FIX (правильный как в uip) ===== */
+/* ===================================================== */
 
-    uint8_t *ext = (uint8_t *)UIP_IP_BUF + UIP_IPH_LEN;
+/*uint8_t before = SICSLOWPAN_IP_BUF->proto;
+uint8_t real = before;   // ?? важно!
 
-    if(ext + 2 < (uint8_t *)uip_buf + uip_len) {
-      uint8_t next = ext[0];
+if(before == 0) {
+  real = get_real_proto();
+  printf("[REAL_PROTO] before = %u, detected = %u\n", before, real);
+} else {
+  printf("[REAL_PROTO] before = %u (no need to detect)\n", before);
+}
 
-      if(next == UIP_PROTO_TCP ||
-         next == UIP_PROTO_UDP ||
-         next == UIP_PROTO_ICMP6) {
+// применяем фикс ТОЛЬКО если реально что-то нашли 
+if(before == 0 &&
+   (real == UIP_PROTO_TCP ||
+    real == UIP_PROTO_UDP ||
+    real == UIP_PROTO_ICMP6)) {
 
-        SICSLOWPAN_IP_BUF->proto = next;
-      }
-    }
-  }
+  printf("[REAL_PROTO] >>> APPLY FIX: %u -> %u\n", before, real);
 
-/* ----------------------------------------------------------------*/
- /*                                                    NEXT HEADER*/
+  SICSLOWPAN_IP_BUF->proto = real;
+
+  printf("[REAL_PROTO] raw next header chain start = %u\n",
+         UIP_IP_BUF->proto);
+
+} else {
+  printf("[REAL_PROTO] skip fix, proto = %u\n", real);
+}*/
+/* ===================================================== */
+
+ /*----------------------------NEXT HEADER--------------------------*/
   printf("uncompress_hdr_hc06: FINAL proto after full decompression = %d  ", SICSLOWPAN_IP_BUF->proto);
   if (SICSLOWPAN_IP_BUF->proto == UIP_PROTO_TCP) {
     printf("TCP !!! dport = %u  flags = 0x%02x\n",
@@ -2037,6 +2051,41 @@ input(void)
     uip_len = sicslowpan_len;
     sicslowpan_len = 0;
     processed_ip_in_len = 0;
+
+  /* ================= ВОТ СЮДА ВСТАВЛЯЕМ ================= */
+
+  uint8_t proto = UIP_IP_BUF->proto;
+
+  if(proto == 0) {
+    proto = get_real_proto();
+    printf("[REAL_PROTO] detected = %u\n", proto);
+  }
+
+  if(proto == UIP_PROTO_TCP) {
+
+    uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
+
+    printf("[EARLY] dst_port = %u\n", dst_port);
+
+    if(dst_port == 22) {
+
+      printf(">>> EARLY FORWARD TO TAP <<<\n");
+
+      printf("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); printf("\n");
+      printf("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); printf("\n");
+
+      /* NAT */
+      check_for_tcp_syn();
+
+      /* ОТПРАВКА */
+      tapdev_send();
+
+      uip_len = 0;
+      return;
+    }
+  }
+
+  /* ================= ДО ЭТОГО МЕСТА ================= */
 #endif /* SICSLOWPAN_CONF_FRAG */
 
 #if DEBUG
@@ -2062,21 +2111,36 @@ input(void)
     printf("uip_len = %u\n", uip_len);
     printf("PROTO = %u\n", UIP_IP_BUF->proto);
 
+    uint16_t src_port = uip_ntohs(UIP_TCP_BUF->srcport);
+    uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
+
     printf("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); printf("\n");
     printf("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); printf("\n");
+    printf("srcport=%u dstport=%u flags=0x%02x\n", src_port, dst_port, UIP_TCP_BUF->flags);
     check_for_tcp_syn();
+    uint16_t src_port2 = uip_ntohs(UIP_TCP_BUF->srcport);
+    uint16_t dst_port2 = uip_ntohs(UIP_TCP_BUF->destport);
 
-  // Проверяем, SSH ли пакет
+    printf("SRC_after: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); printf("\n");
+    printf("DST_after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); printf("\n");
+    printf("srcport_after=%u dstport_after=%u flags_after=0x%02x\n", src_port2, dst_port2, UIP_TCP_BUF->flags);
+
+  // --- ТВОЙ FORWARD ---
   /*if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
      uip_ntohs(UIP_TCP_BUF->destport) == 22) {
 
-    // Forward на Linux
-    tapdev_send();
+    PRINTF(">>> MANUAL FORWARD TO TAP <<<\n");
 
-    uip_len = 0; // пакет обработан
-    tcpip_is_forwarding = 0;
+    PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
+    PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+    printf("srcport=%u dstport=%u flags=0x%02x\n", src_port, dst_port, UIP_TCP_BUF->flags);
+
+    //tapdev_send();
+
+    uip_len = 0;   // ОЧЕНЬ ВАЖНО
     return;
   }*/
+
 
     PRINTF("SRC_tcp_syn: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
     PRINTF("DST_tcp_syn: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");

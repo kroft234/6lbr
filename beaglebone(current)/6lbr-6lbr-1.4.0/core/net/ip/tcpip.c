@@ -324,6 +324,17 @@ uint8_t get_real_proto(void)
         return *nexthdr;
     }
 
+    /* ================== ВОТ СЮДА ДОБАВЛЯЕМ ================== */
+
+    /* Проверка: не вылезли ли за пределы пакета */
+    if((UIP_LLH_LEN + UIP_IPH_LEN + ext_len + 8) > uip_len) {
+      PRINTF("[PROTO] ERROR: out of bounds (ext_len=%u, uip_len=%u)\n",
+             ext_len, uip_len);
+      return *nexthdr;
+    }
+
+    /* ======================================================= */
+
     struct uip_ext_hdr *ext = (struct uip_ext_hdr *)
       &uip_buf[UIP_LLH_LEN + UIP_IPH_LEN + ext_len];
 
@@ -331,6 +342,12 @@ uint8_t get_real_proto(void)
 
     nexthdr = &ext->next;
     ext_len += (ext->len << 3) + 8;
+
+    /* (опционально, но очень полезно) */
+    if(ext_len > UIP_BUFSIZE) {
+      PRINTF("[PROTO] ERROR: ext_len overflow (%u)\n", ext_len);
+      return *nexthdr;
+    }
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -340,10 +357,18 @@ uint8_t get_real_proto(void)
 void check_for_tcp_syn(void)
 {
 
-  uint8_t proto = get_real_proto();
+  uint8_t before = UIP_IP_BUF->proto;
+  uint8_t proto = before;
+
+  if(before == 0) {
+    proto = get_real_proto();
+    printf("[REAL_PROTO] before = %u, detected = %u\n", before, proto);
+  }
   PRINTF("[DEBUG] get_real_proto = %u\n", proto);
   if (proto != UIP_PROTO_TCP) {
     PRINTF("[CHECK] Not TCP, skip\n");
+      printf("DBG: TCP destport raw = 0x%04x, ntohs = %u\n",
+       UIP_TCP_BUF->destport, uip_ntohs(UIP_TCP_BUF->destport));
     return;
   }
   PRINTF("[CHECK] TCP detected!\n");
@@ -354,10 +379,11 @@ void check_for_tcp_syn(void)
   uint8_t ext_len = uip_ext_len; // длина ext-header, которая уже вычисляется в tcpip_input
   struct uip_tcpip_hdr *tcp = (struct uip_tcpip_hdr *)(uip_buf + UIP_LLH_LEN + ext_len);
   uint16_t dst_port = uip_ntohs(tcp->destport);
-  printf("DBG_new: TCP destport raw = 0x%04x, ntohs = %u\n",
-       UIP_TCP_BUF->destport, uip_ntohs(UIP_TCP_BUF->destport));
+  uint16_t src_port = uip_ntohs(tcp->srcport);
 
-  //uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
+  printf("DBG_REAL: srcport=%u dstport=%u flags=0x%02x\n",
+         src_port, dst_port, tcp->flags);
+
   if (dst_port != SSH_PORT) {
     return;
   }
@@ -384,7 +410,7 @@ void check_for_tcp_syn(void)
 
   // сохраняем оригинальный src (для reverse NAT)
   uip_ip6addr_copy(&e->orig_src, &UIP_IP_BUF->srcipaddr);
-  e->orig_src_port = uip_ntohs(UIP_TCP_BUF->srcport);
+  e->orig_src_port = src_port;
   e->new_dst_port = SSH_PORT;
   e->valid = 1;
 
@@ -396,14 +422,14 @@ void check_for_tcp_syn(void)
   UIP_TCP_BUF->destport = uip_htons(SSH_PORT);
 
   // пересчёт checksum
-  UIP_TCP_BUF->tcpchksum = 0;
+  tcp->tcpchksum = 0;
   uint16_t new_sum = uip_tcpchksum();
-  UIP_TCP_BUF->tcpchksum = ~new_sum;
+  tcp->tcpchksum = ~new_sum;
 
   printf("Rewritten > DST: ");
   print_ip6("", &UIP_IP_BUF->destipaddr);
   printf("TCP checksum after: 0x%04x\n",
-         uip_ntohs(UIP_TCP_BUF->tcpchksum));
+         uip_ntohs(tcp->tcpchksum));
 }
 /*---------------------------------------------------------------------------*/
 
@@ -498,7 +524,7 @@ packet_input(void)
       PRINTF("DST after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
       // Проверяем, SSH ли пакет
-      if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
+      /*if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
          uip_ntohs(UIP_TCP_BUF->destport) == 22) {
 
       // Forward на Linux
@@ -507,7 +533,7 @@ packet_input(void)
       uip_len = 0; // пакет обработан
       tcpip_is_forwarding = 0;
       return;
-      }
+      }*/
 
       print("Calling uip_input()\n");
       uip_input();
@@ -554,7 +580,7 @@ packet_input(void)
     check_for_tcp_syn();
 
   // --- ТВОЙ FORWARD ---
-  if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
+  /*if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
      uip_ntohs(UIP_TCP_BUF->destport) == 22) {
 
     PRINTF(">>> MANUAL FORWARD TO TAP <<<\n");
@@ -566,7 +592,7 @@ packet_input(void)
 
     uip_len = 0;   // ОЧЕНЬ ВАЖНО
     return;
-  }
+  }*/
 
      // --- обычная обработка ---
     /*PRINTF("Calling uip_input()\n");*/

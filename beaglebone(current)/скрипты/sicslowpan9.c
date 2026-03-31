@@ -825,6 +825,7 @@ printf("iphc0 = 0x%02x (FL_C=%d, TC_C=%d, NH_C=%d, TTL=%d)\n",
     printf("After shifting hc06_ptr IPHC: CID flag set: byte value = 0x%02x, position in buffer = %d\n", *hc06_ptr, hc06_ptr - packetbuf_ptr);
    } 
 
+  // < Добавь дамп на приёме <
   printf("uncompress_hdr_hc06: dump first 40 bytes on receive: ");
   for (int i = 0; i < 40; i++) {
     printf("%02x ", PACKETBUF_IPHC_BUF[i]);
@@ -891,17 +892,21 @@ printf("Flags: FL_C=%d TC_C=%d NH_C=%d TTL=%d\n",
 
 printf("hc06_ptr offset now = %ld\n", hc06_ptr - packetbuf_ptr);
 
+/* покажем 12 байт начиная с текущего указателя */
 printf("Bytes from hc06_ptr: ");
 for(int i = 0; i < 12; i++) {
   printf("%02x ", hc06_ptr[i]);
 }
 printf("\n");
 
+/* покажем весь IPHC кусок пакета */
 printf("Full IPHC header region: ");
 for(int i = 0; i < 20; i++) {
   printf("%02x ", PACKETBUF_IPHC_BUF[i]);
 }
 printf("\n");
+
+/* попробуем угадать где Next Header */
 printf("Possible Next Header candidates:\n");
 printf("offset+0 : %02x\n", hc06_ptr[0]);
 printf("offset+1 : %02x\n", hc06_ptr[1]);
@@ -911,18 +916,52 @@ printf("offset+4 : %02x\n", hc06_ptr[4]);
 
 printf("====== END TF/FL DEBUG ======\n\n");
 
-printf("[NH_DEBUG] hc06_ptr offset BEFORE NH = %ld\n", hc06_ptr - packetbuf_ptr);
-printf("[NH_DEBUG] next header candidate = %02x\n", *hc06_ptr);
-printf("[NH_DEBUG] next+1 = %02x\n", *(hc06_ptr+1));
-
 /* Next Header */
-if((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
+  if((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
     /* Next header is carried inline */
     SICSLOWPAN_IP_BUF->proto = *hc06_ptr;
-    hc06_ptr += 1;
-    PRINTF("IPHC: next header inline: %d\n", SICSLOWPAN_IP_BUF->proto);
-    printf("After shifting hc06_ptr Next Header: byte value = 0x%02x, position in buffer = %d\n", *hc06_ptr, hc06_ptr - packetbuf_ptr);
+/* --- FIX: иногда hc06_ptr смещён и proto читается как 0 --- */
+if(SICSLOWPAN_IP_BUF->proto == 0) {
+
+  uint8_t ipv6_nh = ((uint8_t *)SICSLOWPAN_IP_BUF)[6];
+
+  printf("HC06 FIX: proto read as 0, checking IPv6 header byte6 = %u\n", ipv6_nh);
+
+  if(ipv6_nh == UIP_PROTO_TCP ||
+     ipv6_nh == UIP_PROTO_UDP ||
+     ipv6_nh == UIP_PROTO_ICMP6) {
+
+    SICSLOWPAN_IP_BUF->proto = ipv6_nh;
+
+    printf("HC06 FIX APPLIED: proto corrected to %u\n",
+           SICSLOWPAN_IP_BUF->proto);
+  }
 }
+    PRINTF("IPHC: next header inline: %d\n", SICSLOWPAN_IP_BUF->proto);
+    hc06_ptr += 1;
+    printf("After shifting hc06_ptr Next Header: byte value = 0x%02x, position in buffer = %d\n", *hc06_ptr, hc06_ptr - packetbuf_ptr);
+
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // ДОБАВИТЬ ЗДЕСЬ — TCP-хак для исправления proto=0 в SSH-пакетах
+    /*if (SICSLOWPAN_IP_BUF->proto == 0) {
+      // Проверяем, выглядит ли это как TCP-пакет (по порту 22 в заголовке после возможного сдвига)
+      // Пытаемся прочитать порт назначения (destport) из предполагаемого TCP-заголовка
+      uint16_t possible_dport = 0;
+      if (hc06_ptr + 2 <= packetbuf_ptr + packetbuf_datalen()) {  // проверка на выход за буфер
+        possible_dport = (hc06_ptr[0] << 8) | hc06_ptr[1];  // destport в TCP-заголовке
+      }
+      if (possible_dport == 22 || possible_dport == UIP_HTONS(22)) {
+        // Это выглядит как SYN на порт 22 > восстанавливаем proto
+        // Откатываем лишний сдвиг на 3 байта (из compressed TC)
+        hc06_ptr -= 3;
+        SICSLOWPAN_IP_BUF->proto = *hc06_ptr;
+        printf("TCP HACK ACTIVATED: proto was 0 > restored to %d (TCP port 22 detected) at pos %d\n",
+               SICSLOWPAN_IP_BUF->proto, (int)(hc06_ptr - packetbuf_ptr));
+      }
+    }*/
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  }
+
   /* Hop limit */
   if((iphc0 & 0x03) != SICSLOWPAN_IPHC_TTL_I) {
     SICSLOWPAN_IP_BUF->ttl = ttl_values[iphc0 & 0x03];
@@ -931,7 +970,7 @@ if((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) {
     hc06_ptr += 1;
   }
 
-/*---------------------------------------------------------------------*/
+/*--- Дополнительный лог для ранней диагностики ----------------------*/
 printf("uncompress_hdr_hc06: proto BEFORE addr uncompress = %d\n", SICSLOWPAN_IP_BUF->proto);
 /*--------------------------------------------------------------------*/
 
@@ -1081,40 +1120,8 @@ printf("uncompress_hdr_hc06: proto BEFORE addr uncompress = %d\n", SICSLOWPAN_IP
 #endif
   }
 
-
-/* ===================================================== */
-/* ===== REAL PROTO FIX (правильный как в uip) ===== */
-/* ===================================================== */
-
-/*uint8_t before = SICSLOWPAN_IP_BUF->proto;
-uint8_t real = before;   // ?? важно!
-
-if(before == 0) {
-  real = get_real_proto();
-  printf("[REAL_PROTO] before = %u, detected = %u\n", before, real);
-} else {
-  printf("[REAL_PROTO] before = %u (no need to detect)\n", before);
-}
-
-// применяем фикс ТОЛЬКО если реально что-то нашли 
-if(before == 0 &&
-   (real == UIP_PROTO_TCP ||
-    real == UIP_PROTO_UDP ||
-    real == UIP_PROTO_ICMP6)) {
-
-  printf("[REAL_PROTO] >>> APPLY FIX: %u -> %u\n", before, real);
-
-  SICSLOWPAN_IP_BUF->proto = real;
-
-  printf("[REAL_PROTO] raw next header chain start = %u\n",
-         UIP_IP_BUF->proto);
-
-} else {
-  printf("[REAL_PROTO] skip fix, proto = %u\n", real);
-}*/
-/* ===================================================== */
-
- /*----------------------------NEXT HEADER--------------------------*/
+/* ----------------------------------------------------------------*/
+ /* ЭТОТ БЛОК ДОЛЖЕН БЫТЬ ЗДЕСЬ — ПОСЛЕ ВСЕЙ ОБРАБОТКИ NEXT HEADER*/
   printf("uncompress_hdr_hc06: FINAL proto after full decompression = %d  ", SICSLOWPAN_IP_BUF->proto);
   if (SICSLOWPAN_IP_BUF->proto == UIP_PROTO_TCP) {
     printf("TCP !!! dport = %u  flags = 0x%02x\n",
@@ -1645,7 +1652,7 @@ output(const uip_lladdr_t *localdest)
            (uint8_t *)UIP_IP_BUF + uncomp_hdr_len, packetbuf_payload_len);
     packetbuf_set_datalen(packetbuf_payload_len + packetbuf_hdr_len);
 
-    // LOG                
+    // LOG перед отправкой
     printf("sicslowpan_output: sending fragment to MAC dest=%02x%02x%02x%02x%02x%02x\n",
            dest.u8[0],dest.u8[1],dest.u8[2],
            dest.u8[3],dest.u8[4],dest.u8[5]);
@@ -1735,7 +1742,7 @@ output(const uip_lladdr_t *localdest)
            uip_len - uncomp_hdr_len);
     packetbuf_set_datalen(uip_len - uncomp_hdr_len + packetbuf_hdr_len);
 
-    // LOG                
+    // LOG перед отправкой
     printf("sicslowpan_output: sending packet to MAC dest=%02x%02x%02x%02x%02x%02x\n",
            dest.u8[0],dest.u8[1],dest.u8[2],
            dest.u8[3],dest.u8[4],dest.u8[5]);
@@ -1790,7 +1797,7 @@ input(void)
      want to query us for it later. */
   last_rssi = (signed short)packetbuf_attr(PACKETBUF_ATTR_RSSI);
 
- // <                                       
+ // < САМЫЙ РАННИЙ ЛОГ — что пришло по радио
   printf("------------START sicslowpan_input-----------------------------------\n");
   printf("sicslowpan_input: THE PACKAGE HAS ARRIVED len=%d RSSI=%d dBm from MAC=%02x%02x%02x%02x%02x%02x\n",
          packetbuf_datalen(),
@@ -1802,7 +1809,7 @@ input(void)
          packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[4],
          packetbuf_addr(PACKETBUF_ADDR_SENDER)->u8[5]);
 
-  /*             payload */
+  /* Вывод всего payload */
   printf("RAW PACKET DATA: ");
   for(int i = 0; i < packetbuf_datalen(); i++) {
      printf("%02x ", ((uint8_t *)packetbuf_ptr)[i]);
@@ -1810,9 +1817,9 @@ input(void)
   printf("\n");
 
   uint8_t dispatch = PACKETBUF_HC1_PTR[PACKETBUF_HC1_DISPATCH];
-  printf("sicslowpan_input: dispatch=0x%02x (IPHC      0x7x)\n", dispatch);
+  printf("sicslowpan_input: dispatch=0x%02x (IPHC если 0x7x)\n", dispatch);
   
-  // =====                               =====
+  // ===== Вывод адресов до декомпрессии =====
   PRINTF("sicslowpan input: SRC-before: ");
   const uint8_t *sender = (const uint8_t *)packetbuf_addr(PACKETBUF_ADDR_SENDER);
   for(int i = 0; i < LINKADDR_SIZE; i++) {
@@ -1944,7 +1951,7 @@ input(void)
   /* Process next dispatch and headers */
 #if SICSLOWPAN_COMPRESSION == SICSLOWPAN_COMPRESSION_HC06
   if((PACKETBUF_HC1_PTR[PACKETBUF_HC1_DISPATCH] & 0xe0) == SICSLOWPAN_DISPATCH_IPHC) {
-    printf("sicslowpan_input: IPHC   calling uncompress_hdr_hc06\n");
+    printf("sicslowpan_input: IPHC — calling uncompress_hdr_hc06\n");
     uncompress_hdr_hc06(frag_size);
   } else
 #endif /* SICSLOWPAN_COMPRESSION == SICSLOWPAN_COMPRESSION_HC06 */
@@ -1973,7 +1980,7 @@ input(void)
       return;
   }
 
-  // =====                                  =====
+  // ===== Вывод адресов после декомпрессии =====
   PRINTF("sicslowpan input: SRC-after: ");
   for(int i = 0; i < 16; i++) {
     PRINTF("%02x", UIP_IP_BUF->srcipaddr.u8[i]);
@@ -2072,44 +2079,7 @@ input(void)
     }
 
     tcpip_input();
-    printf("\n=== AFTER tcpip_input ===\n");
-    printf("uip_len = %u\n", uip_len);
-    printf("PROTO = %u\n", UIP_IP_BUF->proto);
-
-    uint16_t src_port = uip_ntohs(UIP_TCP_BUF->srcport);
-    uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
-
-    printf("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); printf("\n");
-    printf("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); printf("\n");
-    printf("srcport=%u dstport=%u flags=0x%02x\n", src_port, dst_port, UIP_TCP_BUF->flags);
     check_for_tcp_syn();
-    uint16_t src_port2 = uip_ntohs(UIP_TCP_BUF->srcport);
-    uint16_t dst_port2 = uip_ntohs(UIP_TCP_BUF->destport);
-
-    printf("SRC_after: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); printf("\n");
-    printf("DST_after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); printf("\n");
-    printf("srcport_after=%u dstport_after=%u flags_after=0x%02x\n", src_port2, dst_port2, UIP_TCP_BUF->flags);
-
-  // --- ТВОЙ FORWARD ---
-  if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
-     uip_ntohs(UIP_TCP_BUF->destport) == 22) {
-
-    PRINTF(">>> MANUAL FORWARD TO TAP <<<\n");
-
-    PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
-    PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
-    printf("srcport=%u dstport=%u flags=0x%02x\n", src_port, dst_port, UIP_TCP_BUF->flags);
-
-    //tapdev_send();
-
-    /*uip_len = 0;   // ОЧЕНЬ ВАЖНО
-    return;*/
-  }
-
-
-    PRINTF("SRC_tcp_syn: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
-    PRINTF("DST_tcp_syn: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
-
     printf("------------END sicslowpan_input-----------------------------------\n");
 #if SICSLOWPAN_CONF_FRAG
   }
