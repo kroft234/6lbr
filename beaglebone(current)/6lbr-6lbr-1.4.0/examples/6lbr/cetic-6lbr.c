@@ -215,11 +215,38 @@ cetic_6lbr_init(void)
 
 #if CETIC_6LBR_SMARTBRIDGE
 
+  // === ДОБАВЛЯЕМ ИЗВЕСТНЫЕ ETHERNET ХОСТЫ В NEIGHBOR CACHE ===
+  {
+    uip_ipaddr_t pc1_ip;
+    uip_lladdr_t pc1_lladdr;
+    
+    // PC1 адрес: aaaa::212:4b00:40e:fa85
+    uip_ip6addr(&pc1_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa85);
+    
+    // PC1 MAC адрес (замени на реальный MAC PC1)
+    pc1_lladdr.addr[0] = 0x02;  // Example MAC - ЗАМЕНИ НА РЕАЛЬНЫЙ
+    pc1_lladdr.addr[1] = 0x12;
+    pc1_lladdr.addr[2] = 0x4b;
+    pc1_lladdr.addr[3] = 0xFF;
+    pc1_lladdr.addr[4] = 0x04;
+    pc1_lladdr.addr[5] = 0x0e;
+    pc1_lladdr.addr[6] = 0xfa;
+    pc1_lladdr.addr[7] = 0x85;
+    
+    // Добавляем в neighbor cache со статуса NBR_REACHABLE
+    uip_ds6_nbr_add(&pc1_ip, &pc1_lladdr, 0, NBR_REACHABLE);
+    LOG6LBR_6ADDR(INFO, &pc1_ip, "Added Ethernet host to neighbor cache: ");
+  }
+  // ==========================================================
+
   if((nvm_data.mode & CETIC_MODE_WAIT_RA_MASK) == 0)    //Manual configuration
   {
     memcpy(wsn_net_prefix.u8, &nvm_data.wsn_net_prefix,
            sizeof(nvm_data.wsn_net_prefix));
     wsn_net_prefix_len = nvm_data.wsn_net_prefix_len;
+    LOG6LBR_6ADDR(INFO, &wsn_net_prefix, "WSN net prefix loaded from NVM: ");
+    LOG6LBR_INFO("WSN net prefix len: %d\n", wsn_net_prefix_len);
+
     if((nvm_data.mode & CETIC_MODE_WSN_AUTOCONF) != 0)  //Address auto configuration
     {
       uip_ipaddr_copy(&wsn_ip_addr, &wsn_net_prefix);
@@ -241,11 +268,26 @@ cetic_6lbr_init(void)
            sizeof(nvm_data.dns_server));
     uip_nameserver_update(&dns, UIP_NAMESERVER_INFINITE_LIFETIME);
   } else {                            //End manual configuration
-    uip_create_unspecified(&wsn_net_prefix);
-    wsn_net_prefix_len = 0;
+    // === ДОБАВЛЯЕМ ИНИЦИАЛИЗАЦИЮ ПРЕФИКСОВ ДЛЯ WAIT_RA MODE ===
+    memcpy(wsn_net_prefix.u8, &nvm_data.wsn_net_prefix,
+           sizeof(nvm_data.wsn_net_prefix));
+    wsn_net_prefix_len = nvm_data.wsn_net_prefix_len;
+    LOG6LBR_6ADDR(INFO, &wsn_net_prefix, "WSN net prefix loaded (WAIT_RA): ");
+    // Также инициализируем eth_net_prefix для SMARTBRIDGE
+    memcpy(eth_net_prefix.u8, &nvm_data.eth_net_prefix,
+           sizeof(nvm_data.eth_net_prefix));
+    LOG6LBR_6ADDR(INFO, &eth_net_prefix, "ETH net prefix loaded (WAIT_RA): ");
+    // ==========================================================
+    // Эти строки убираем или комментируем, так как префиксы уже инициализированы
+    // uip_create_unspecified(&wsn_net_prefix);
+    // wsn_net_prefix_len = 0;
     uip_create_unspecified(&wsn_ip_addr);
+    LOG6LBR_INFO("SMARTBRIDGE: WAIT_RA mode - but prefixes loaded from NVM\n");
   }
 #endif
+
+  LOG6LBR_6ADDR(INFO, &wsn_net_prefix, "WSN net prefix after SMARTBRIDGE init: ");
+  LOG6LBR_INFO("WSN net prefix len after SMARTBRIDGE init: %d\n", wsn_net_prefix_len);
 
 #if CETIC_6LBR_ROUTER
   //WSN network configuration
@@ -546,6 +588,51 @@ PROCESS_THREAD(cetic_6lbr_process, ev, data)
   }
   cetic_6lbr_init_finalize();
   platform_load_config(CONFIG_LEVEL_NETWORK);
+
+/*-------------------------------------------------------------------------*/
+  /* --- ДОБАВЛЕНИЕ СТАТИЧЕСКОГО МАРШРУТА (v1.4.0) --- */
+  {
+    uip_ipaddr_t dest_ip;
+    uip_ipaddr_t nexthop_ip;
+    uip_ds6_route_t *route;
+
+    /* 1. Адрес назначения (PC1 в Ethernet) */
+    uip_ip6addr(&dest_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa85);
+   
+    
+    /* 2. Next Hop. Так как PC1 в одной сети с Ethernet-интерфейсом моста,
+       указываем адрес самого PC1 (on-link маршрут). */
+    //uip_ip6addr(&nexthop_ip, 0xfe80, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+    uip_ip6addr(&nexthop_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+
+    /* 3. Используем _add_static, чтобы обойти проверку neighbor table */
+    route = uip_ds6_route_add_static(&dest_ip, 128, &nexthop_ip);
+    
+    if(route != NULL) {
+      LOG6LBR_INFO("Static route added: aaaa::212:4b00:40e:fa85/128 (on-link)\n");
+    } else {
+      LOG6LBR_ERROR("Failed to add static route\n");
+    }
+
+    /* --- ГЛОБАЛЬНЫЙ АДРЕС --- */
+    uip_ipaddr_t ipaddr;
+    /* Указываем адрес aaaa::fa86 */
+    uip_ip6addr(&ipaddr, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+    
+    /* Регистрируем его как адрес этого устройства */
+    uip_ds6_addr_add(&ipaddr, 0, ADDR_MANUAL);
+    LOG6LBR_INFO("Global IP added: aaaa::212:4b00:40e:fa86\n");
+
+    /* --- LINK-LOCAL АДРЕС --- */
+    /*uip_ipaddr_t lladdr;
+    uip_ip6addr(&lladdr, 0xfe80, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+
+    uip_ds6_addr_add(&lladdr, 0, ADDR_MANUAL);
+    LOG6LBR_INFO("Link-local IP added: fe80::212:4b00:40e:fa86\n");*/
+
+
+  }
+/*-------------------------------------------------------------------------*/
 
 #if CETIC_NODE_CONFIG
   node_config_init();

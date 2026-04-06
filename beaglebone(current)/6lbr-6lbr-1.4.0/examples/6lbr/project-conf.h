@@ -117,14 +117,16 @@
 
 #define UIP_CONF_DS6_STATIC_ROUTES 1
 
-#define CETIC_6LBR_IP64      1
+/*#define CETIC_6LBR_IP64      1*/
+#define CETIC_6LBR_IP64      0  // Без NAT64 (если не нужен)
 
 /* Do not change lines below */
 
 #undef UIP_CONF_ROUTER
 #define UIP_CONF_ROUTER             0
 
-#define CETIC_6LBR_DODAG_ROOT		1
+/*#define CETIC_6LBR_DODAG_ROOT		1*/
+#define CETIC_6LBR_DODAG_ROOT      0  // НЕ быть DODAG ROOT
 
 #define CETIC_6LBR_ETH_FILTER_RPL	1
 
@@ -141,7 +143,7 @@
 //Local link address is already reserved
 #define UIP_CONF_DS6_ADDR_NBU 5
 
-#define UIP_CONF_DS6_ROUTE_INFORMATION	0
+#define UIP_CONF_DS6_ROUTE_INFORMATION	1
 
 #define UIP_CONF_ND6_RA_RDNSS 0
 

@@ -1,0 +1,436 @@
+1. IPv6 packet received from bbbb::e4b3:db0:9fa1:2174 to aaaa::212:4b00:40e:fa83
+2. Forwarding packet to aaaa::212:4b00:40e:fa83
+3. Sending packet with length 88 (48)
+4. IPv6 packet send from bbbb::e4b3:db0:9fa1:2174 to aaaa::212:4b00:40e:fa83
+5. uip-ds6-route: Looking up route for aaaa::212:4b00:40e:fa83
+6. uip-ds6-route: Found route: aaaa::212:4b00:40e:fa83 via fe80::212:4b00:40e:fa83
+7. sicslowpan output: sending packet len 88
+8. before compression (48): 600000000030007fbbbb000000000000e4b30db09fa12174aaaa00000000000002124b00040efa833a006304801e010080006ef50001007f6162636465666768696a6b6c6d6e6f7071727374757677616263646566676869
+9. IPHC: compressing dest or src ipaddr - setting CID
+10. sicslowpan output: header of len 21
+/////////////////////////////////////////////////////////////////////////////////
+11. sicslowpan input: IPHC
+12. IPHC: CID flag set - increase header with one
+13. IPHC: next header inline: 0
+14. Uncompressing 8 + 0 => aaaa::212:4b00:40e:fa83
+15. Uncompressing 0 + 16 => bbbb::e4b3:db0:9fa1:2174
+16. sicslowpan_init processed_ip_in_len 0, sicslowpan_len 88
+17. sicslowpan input: IP packet ready (length 88)
+18. after decompression 48:6000000000300040aaaa00000000000002124b00040efa83bbbb000000000000e4b30db09fa121743a006304001e023681006df50001007f6162636465666768696a6b6c6d6e6f7071727374757677616263646566676869
+19. IPv6 packet received from aaaa::212:4b00:40e:fa83 to bbbb::e4b3:db0:9fa1:2174
+20. Processing RPL option
+21. uip-ds6-route: Looking up route for bbbb::e4b3:db0:9fa1:2174
+22. uip-ds6-route: No route found
+23. Forwarding packet to bbbb::e4b3:db0:9fa1:2174
+24. Sending packet with length 88 (48)
+25. IPv6 packet send from aaaa::212:4b00:40e:fa83 to bbbb::e4b3:db0:9fa1:2174
+
+1. uip6.c void uip_process(uint8_t flag)
+2. uip6.c void uip_process(uint8_t flag) goto send;
+3. uip6.c void uip_process(uint8_t flag) send:
+4. tcpip.c void tcpip_ipv6_output(void)
+5. uip-ds6-route.c uip_ds6_route_t *uip_ds6_route_lookup(uip_ipaddr_t *addr)
+6. uip-ds6-route.c uip_ds6_route_t *uip_ds6_route_lookup(uip_ipaddr_t *addr) if(found_route != NULL)
+7. sicslowpan.c static uint8_t output(const uip_lladdr_t *localdest)
+8. sicslowpan.c static void compress_hdr_hc06(linkaddr_t *link_destaddr) 
+9. sicslowpan.c static void compress_hdr_hc06(linkaddr_t *link_destaddr) if(addr_context_lookup_by_prefix(&UIP_IP_BUF->destipaddr) != NULL || addr_context_lookup_by_prefix(&UIP_IP_BUF->srcipaddr) != NULL)
+10. sicslowpan.c static uint8_t output(const uip_lladdr_t *localdest)
+
+11. sicslowpan.c static void input(void) if((PACKETBUF_HC1_PTR[PACKETBUF_HC1_DISPATCH] & 0xe0) == SICSLOWPAN_DISPATCH_IPHC) { uncompress_hdr_hc06(frag_size);}
+12. sicslowpan.c static void uncompress_hdr_hc06(uint16_t ip_len) if(iphc1 & SICSLOWPAN_IPHC_CID) { hc06_ptr++; }
+13. sicslowpan.c static void uncompress_hdr_hc06(uint16_t ip_len) if((iphc0 & SICSLOWPAN_IPHC_NH_C) == 0) { SICSLOWPAN_IP_BUF->proto = *hc06_ptr; hc06_ptr += 1; }
+14. sicslowpan.c static void uncompress_addr(uip_ipaddr_t *ipaddr, uint8_t const prefix[], uint8_t pref_post_count, uip_lladdr_t *lladdr)
+15. sicslowpan.c static void uncompress_addr(uip_ipaddr_t *ipaddr, uint8_t const prefix[], uint8_t pref_post_count, uip_lladdr_t *lladdr)
+16. sicslowpan.c static void input(void) sicslowpan_len = packetbuf_payload_len + uncomp_hdr_len;
+17. sicslowpan.c static void input(void) memcpy((uint8_t *)UIP_IP_BUF, (uint8_t *)SICSLOWPAN_IP_BUF, sicslowpan_len);
+18. sicslowpan.c static void input(void) tcpip_input();
+19. uip6.c void uip_process(uint8_t flag)
+20. uip6.c static uint8_t ext_hdr_options_process(void)  case UIP_EXT_HDR_OPT_RPL: 
+21. uip-ds6-route.c uip_ds6_route_t *uip_ds6_route_lookup(uip_ipaddr_t *addr)
+22. if(found_route != NULL) {else { PRINTF("uip-ds6-route: No route found\n");}
+23. uip6.c void uip_process(uint8_t flag) goto send;
+24. uip6.c void uip_process(uint8_t flag) send:
+25. tcpip.c void tcpip_ipv6_output(void)
+.
+///////////////////////////////////////////////////////////////////////////////////////////
+------------START sicslowpan_input-----------------------------------
+sicslowpan_input: THE PACKAGE HAS ARRIVED len=104 RSSI=0 dBm from MAC=00124b00040e
+RAW PACKET DATA: 68 85 00 02 fc a6 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0 fa 92 13 94 02 12 4b 00 04 0e fa 82 3a 00 63 04 80 1e 01 00 80 00 4f 2f 7b c2 00 06 84 95 cf 69 9c f5 0a 00 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37
+sicslowpan_input: dispatch=0x68 (IPHC      0x7x)
+sicslowpan input: SRC-before: 00124b00040ef3ed DST-before: 00124b00040efa83
+sicslowpan_input: IPHC   calling uncompress_hdr_hc06
+iphc0 = 0x68 (FL_C=0, TC_C=1, NH_C=0, TTL=0)
+IPHC: CID flag set - increase header with one
+After shifting hc06_ptr IPHC: CID flag set: byte value = 0x02, position in buffer = 3
+uncompress_hdr_hc06: dump first 40 bytes on receive: 68 85 00 02 fc a6 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0 fa 92 13 94 02 12 4b 00 04 0e fa 82 3a 00 63 04 80 1e 01 00
+Before shifting hc06_ptr, do Traffic class is compressed: byte value = 0x02, position in buffer = 3
+After shifting hc06_ptr posle Traffic class is compressed: byte value = 0x00, position in the buffer = 6
+
+====== IPHC DEBUG TF/FL ANALYSIS ======
+iphc0 = 0x68  iphc1 = 0x85
+Flags: FL_C=0 TC_C=1 NH_C=0 TTL=0
+hc06_ptr offset now = 6
+Bytes from hc06_ptr: 00 3f bb bb 00 00 00 00 00 00 f0 c4
+Full IPHC header region: 68 85 00 02 fc a6 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0
+Possible Next Header candidates:
+offset+0 : 00
+offset+1 : 3f
+offset+2 : bb
+offset+3 : bb
+offset+4 : 00
+====== END TF/FL DEBUG ======
+
+[NH_DEBUG] hc06_ptr offset BEFORE NH = 6
+[NH_DEBUG] next header candidate = 00
+[NH_DEBUG] next+1 = 3f
+IPHC: next header inline: 0
+After shifting hc06_ptr Next Header: byte value = 0x3f, position in buffer = 7
+uncompress_hdr_hc06: proto BEFORE addr uncompress = 0
+Uncompressing 0 + 16 => bbbb::f0c4:1da0:fa92:1394
+Uncompressing 8 + 8 => aaaa::212:4b00:40e:fa82
+uncompress_hdr_hc06: FINAL proto after full decompression = 0  UNKNOWN / BROKEN proto (likely compression failed for TCP)
+sicslowpan input: SRC-after: e2156407d08cc0a80626000000000000 DST-after: c0a806fe0000000002124b00040efa82
+sicslowpan_init processed_ip_in_len 0, sicslowpan_len 112
+sicslowpan input: IP packet ready (length 112)
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ext->next = 58, ext->len = 0
+[PROTO] Inspect header = 58, ext_len = 8
+[PROTO] FINAL proto = 58
+[REAL_PROTO] detected = 58
+after decompression 72:6002fca60048003fbbbb000000000000f0c41da0fa921394aaaa00000000000002124b00040efa823a006304801e010080004f2f7bc200068495cf699cf50a0008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637
+
+>>> tcpip_input() CALLED  uip_len = 112 <<<
+  PROTO = 0 (   TCP      ICMPv6)
+  src = bbbb::f0c4:1da0:fa92:1394
+  dst = aaaa::212:4b00:40e:fa82
+  > calling inputfunc() now
+
+=== PACKET_INPUT (NO FORWARD) ===
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ext->next = 58, ext->len = 0
+[PROTO] Inspect header = 58, ext_len = 8
+[PROTO] FINAL proto = 58
+[REAL_PROTO] before = 0, detected = 58
+[DEBUG] get_real_proto = 58
+[CHECK] Not TCP, skip
+DBG: TCP destport raw = 0x0463, ntohs = 25348
+IPv6 packet received from bbbb::f0c4:1da0:fa92:1394 to aaaa::212:4b00:40e:fa82
+Before ext_hdr_options_process, offset=2
+
+=== EXT HDR OPTIONS START ===
+EXT_HDR total len(bytes) = 8
+Initial offset = 2
+
+--- OPTION ITERATION ---
+Current offset = 2
+OPT TYPE = 0x63
+OPT LEN  = 4
+Processing RPL option
+Offset before = 2
+RPL: Unknown instance: 30
+RPL Option Error: Dropping Packet
+Drop after ext hdr, offset=2
+Dropping packet after extension header processing
+=== PACKET_INPUT END ===
+
+=== AFTER tcpip_input ===
+uip_len = 0
+PROTO = 0
+SRC: bbbb::f0c4:1da0:fa92:1394
+DST: aaaa::212:4b00:40e:fa82
+srcport=14848 dstport=25348 flags=0xc2
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ERROR: out of bounds (ext_len=0, uip_len=0)
+[REAL_PROTO] before = 0, detected = 0
+[DEBUG] get_real_proto = 0
+[CHECK] Not TCP, skip
+DBG: TCP destport raw = 0x0463, ntohs = 25348
+SRC_after: bbbb::f0c4:1da0:fa92:1394
+DST_after: aaaa::212:4b00:40e:fa82
+srcport_after=14848 dstport_after=25348 flags_after=0xc2
+SRC_tcp_syn: bbbb::f0c4:1da0:fa92:1394
+DST_tcp_syn: aaaa::212:4b00:40e:fa82
+------------END sicslowpan_input-----------------------------------
+
+/////////////////////////////////////////////////////////////////////////////
+------------START sicslowpan_input-----------------------------------
+sicslowpan_input: THE PACKAGE HAS ARRIVED len=104 RSSI=0 dBm from MAC=00124b00040e
+RAW PACKET DATA: 68 85 00 02 fc a6 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0 fa 92 13 94 02 12 4b 00 04 0e fa 82 3a 00 63 04 80 1e 01 00 80 00 9a 6b 02 dc 00 02 a8 96 cf 69 ad a2 03 00 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37
+sicslowpan_input: dispatch=0x68 (IPHC      0x7x)
+sicslowpan input: SRC-before: 00124b00040ef3ed DST-before: 00124b00040efa83
+sicslowpan_input: IPHC   calling uncompress_hdr_hc06
+iphc0 = 0x68 (FL_C=0, TC_C=1, NH_C=0, TTL=0)
+IPHC: CID flag set - increase header with one
+After shifting hc06_ptr IPHC: CID flag set: byte value = 0x02, position in buffer = 3
+uncompress_hdr_hc06: dump first 40 bytes on receive: 68 85 00 02 fc a6 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0 fa 92 13 94 02 12 4b 00 04 0e fa 82 3a 00 63 04 80 1e 01 00
+Before shifting hc06_ptr, do Traffic class is compressed: byte value = 0x02, position in buffer = 3
+After shifting hc06_ptr posle Traffic class is compressed: byte value = 0x00, position in the buffer = 6
+
+====== IPHC DEBUG TF/FL ANALYSIS ======
+iphc0 = 0x68  iphc1 = 0x85
+Flags: FL_C=0 TC_C=1 NH_C=0 TTL=0
+hc06_ptr offset now = 6
+Bytes from hc06_ptr: 00 3f bb bb 00 00 00 00 00 00 f0 c4
+Full IPHC header region: 68 85 00 02 fc a6 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0
+Possible Next Header candidates:
+offset+0 : 00
+offset+1 : 3f
+offset+2 : bb
+offset+3 : bb
+offset+4 : 00
+====== END TF/FL DEBUG ======
+
+[NH_DEBUG] hc06_ptr offset BEFORE NH = 6
+[NH_DEBUG] next header candidate = 00
+[NH_DEBUG] next+1 = 3f
+IPHC: next header inline: 0
+After shifting hc06_ptr Next Header: byte value = 0x3f, position in buffer = 7
+uncompress_hdr_hc06: proto BEFORE addr uncompress = 0
+Uncompressing 0 + 16 => bbbb::f0c4:1da0:fa92:1394
+Uncompressing 8 + 8 => aaaa::212:4b00:40e:fa82
+uncompress_hdr_hc06: FINAL proto after full decompression = 0  UNKNOWN / BROKEN proto (likely compression failed for TCP)
+sicslowpan input: SRC-after: e2156407d08cc0a80626000000000000 DST-after: c0a806fe0000000002124b00040efa82
+sicslowpan_init processed_ip_in_len 0, sicslowpan_len 112
+sicslowpan input: IP packet ready (length 112)
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ext->next = 58, ext->len = 0
+[PROTO] Inspect header = 58, ext_len = 8
+[PROTO] FINAL proto = 58
+[REAL_PROTO] detected = 58
+after decompression 72:6002fca60048003fbbbb000000000000f0c41da0fa921394aaaa00000000000002124b00040efa823a006304801e010080009a6b02dc0002a896cf69ada2030008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637
+
+>>> tcpip_input() CALLED  uip_len = 112 <<<
+  PROTO = 0 (   TCP      ICMPv6)
+  src = bbbb::f0c4:1da0:fa92:1394
+  dst = aaaa::212:4b00:40e:fa82
+  > calling inputfunc() now
+
+=== PACKET_INPUT (NO FORWARD) ===
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ext->next = 58, ext->len = 0
+[PROTO] Inspect header = 58, ext_len = 8
+[PROTO] FINAL proto = 58
+[REAL_PROTO] before = 0, detected = 58
+[DEBUG] get_real_proto = 58
+[CHECK] Not TCP, skip
+DBG: TCP destport raw = 0x0463, ntohs = 25348
+IPv6 packet received from bbbb::f0c4:1da0:fa92:1394 to aaaa::212:4b00:40e:fa82
+Before ext_hdr_options_process, offset=8
+
+=== EXT HDR OPTIONS START ===
+EXT_HDR total len(bytes) = 8
+Initial offset = 2
+
+--- OPTION ITERATION ---
+Current offset = 2
+OPT TYPE = 0x63
+OPT LEN  = 4
+Processing RPL option
+Offset before = 2
+RPL: Packet going down, sender closer 1 (256 < 730)
+RPL: Rank OK
+Offset after RPL = 8
+Returning 0 (continue next header)
+After ext_hdr_options_process, offset=8
+RPL: Verifying the presence of the RPL header option
+RPL: Updating RPL option
+uip-ds6-route: Looking up route for aaaa::212:4b00:40e:fa82
+uip-ds6-route: No route found
+RPL: No route found, but SmartBridge mode - ignoring error
+Forwarding packet to aaaa::212:4b00:40e:fa82
+Sending packet with length 112 (72)
+
+========== TCPIP_IPV6_OUTPUT START ==========
+uip_len = 112
+uip_ext_len = 8
+IPv6 proto (raw) = 0
+IPv6 packet send from bbbb::f0c4:1da0:fa92:1394 to aaaa::212:4b00:40e:fa82
+Checking MTU: 112 <= 1500 ?
+Is multicast? 0
+
+--- NEXT HOP DETERMINATION ---
+Destination is OFF-LINK
+Looking for route...
+uip-ds6-route: Looking up route for aaaa::212:4b00:40e:fa82
+uip-ds6-route: No route found
+NO ROUTE found
+SMARTBRIDGE check
+WSN net prefix: aaaa::
+Eth net prefix: aaaa::
+Dest IPaddr: aaaa::212:4b00:40e:fa82
+SMARTBRIDGE: treating as ON-LINK
+
+Selected nexthop = aaaa::212:4b00:40e:fa82
+Updating RPL header...
+RPL update OK
+Looking for neighbor entry...
+Sending packet to MAC layer
+RPL: Verifying the presence of the RPL header option
+RPL: Removing the RPL header option
+=== PACKET_INPUT END ===
+
+=== AFTER tcpip_input ===
+uip_len = 0
+PROTO = 58
+SRC: bbbb::f0c4:1da0:fa92:1394
+DST: aaaa::212:4b00:40e:fa82
+srcport=32768 dstport=39531 flags=0xa2
+[DEBUG] get_real_proto = 58
+[CHECK] Not TCP, skip
+DBG: TCP destport raw = 0x6b9a, ntohs = 39531
+SRC_after: bbbb::f0c4:1da0:fa92:1394
+DST_after: aaaa::212:4b00:40e:fa82
+srcport_after=32768 dstport_after=39531 flags_after=0xa2
+SRC_tcp_syn: bbbb::f0c4:1da0:fa92:1394
+DST_tcp_syn: aaaa::212:4b00:40e:fa82
+------------END sicslowpan_input-----------------------------------
+///////////////////////////////////////////////////////////////////////////
+
+------------START sicslowpan_input-----------------------------------
+sicslowpan_input: THE PACKAGE HAS ARRIVED len=104 RSSI=0 dBm from MAC=00124b00040e
+RAW PACKET DATA: 68 85 00 06 ce 77 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0 fa 92 13 94 02 12 4b 00 04 0e fa 81 3a 00 63 04 80 1e 01 00 80 00 e6 5b 03 c0 00 02 d2 96 cf 69 33 cf 06 00 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37
+sicslowpan_input: dispatch=0x68 (IPHC      0x7x)
+sicslowpan input: SRC-before: 00124b00040ef3ed DST-before: 00124b00040efa83
+sicslowpan_input: IPHC   calling uncompress_hdr_hc06
+iphc0 = 0x68 (FL_C=0, TC_C=1, NH_C=0, TTL=0)
+IPHC: CID flag set - increase header with one
+After shifting hc06_ptr IPHC: CID flag set: byte value = 0x06, position in buffer = 3
+uncompress_hdr_hc06: dump first 40 bytes on receive: 68 85 00 06 ce 77 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0 fa 92 13 94 02 12 4b 00 04 0e fa 81 3a 00 63 04 80 1e 01 00
+Before shifting hc06_ptr, do Traffic class is compressed: byte value = 0x06, position in buffer = 3
+After shifting hc06_ptr posle Traffic class is compressed: byte value = 0x00, position in the buffer = 6
+
+====== IPHC DEBUG TF/FL ANALYSIS ======
+iphc0 = 0x68  iphc1 = 0x85
+Flags: FL_C=0 TC_C=1 NH_C=0 TTL=0
+hc06_ptr offset now = 6
+Bytes from hc06_ptr: 00 3f bb bb 00 00 00 00 00 00 f0 c4
+Full IPHC header region: 68 85 00 06 ce 77 00 3f bb bb 00 00 00 00 00 00 f0 c4 1d a0
+Possible Next Header candidates:
+offset+0 : 00
+offset+1 : 3f
+offset+2 : bb
+offset+3 : bb
+offset+4 : 00
+====== END TF/FL DEBUG ======
+
+[NH_DEBUG] hc06_ptr offset BEFORE NH = 6
+[NH_DEBUG] next header candidate = 00
+[NH_DEBUG] next+1 = 3f
+IPHC: next header inline: 0
+After shifting hc06_ptr Next Header: byte value = 0x3f, position in buffer = 7
+uncompress_hdr_hc06: proto BEFORE addr uncompress = 0
+Uncompressing 0 + 16 => bbbb::f0c4:1da0:fa92:1394
+Uncompressing 8 + 8 => aaaa::212:4b00:40e:fa81
+uncompress_hdr_hc06: FINAL proto after full decompression = 0  UNKNOWN / BROKEN proto (likely compression failed for TCP)
+sicslowpan input: SRC-after: e2156407d08cc0a80626000000000000 DST-after: c0a806fe0000000002124b00040efa83
+sicslowpan_init processed_ip_in_len 0, sicslowpan_len 112
+sicslowpan input: IP packet ready (length 112)
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ext->next = 58, ext->len = 0
+[PROTO] Inspect header = 58, ext_len = 8
+[PROTO] FINAL proto = 58
+[REAL_PROTO] detected = 58
+after decompression 72:6006ce770048003fbbbb000000000000f0c41da0fa921394aaaa00000000000002124b00040efa813a006304801e01008000e65b03c00002d296cf6933cf060008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637
+
+>>> tcpip_input() CALLED  uip_len = 112 <<<
+  PROTO = 0 (   TCP      ICMPv6)
+  src = bbbb::f0c4:1da0:fa92:1394
+  dst = aaaa::212:4b00:40e:fa81
+  > calling inputfunc() now
+
+=== PACKET_INPUT (NO FORWARD) ===
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ext->next = 58, ext->len = 0
+[PROTO] Inspect header = 58, ext_len = 8
+[PROTO] FINAL proto = 58
+[REAL_PROTO] before = 0, detected = 58
+[DEBUG] get_real_proto = 58
+[CHECK] Not TCP, skip
+DBG: TCP destport raw = 0x0463, ntohs = 25348
+IPv6 packet received from bbbb::f0c4:1da0:fa92:1394 to aaaa::212:4b00:40e:fa81
+Before ext_hdr_options_process, offset=8
+
+=== EXT HDR OPTIONS START ===
+EXT_HDR total len(bytes) = 8
+Initial offset = 2
+
+--- OPTION ITERATION ---
+Current offset = 2
+OPT TYPE = 0x63
+OPT LEN  = 4
+Processing RPL option
+Offset before = 2
+RPL: Packet going down, sender closer 1 (256 < 688)
+RPL: Rank OK
+Offset after RPL = 8
+Returning 0 (continue next header)
+After ext_hdr_options_process, offset=8
+RPL: Verifying the presence of the RPL header option
+RPL: Updating RPL option
+uip-ds6-route: Looking up route for aaaa::212:4b00:40e:fa81
+uip-ds6-route: No route found
+RPL: No route found, but SmartBridge mode - ignoring error
+Forwarding packet to aaaa::212:4b00:40e:fa81
+Sending packet with length 112 (72)
+
+========== TCPIP_IPV6_OUTPUT START ==========
+uip_len = 112
+uip_ext_len = 8
+IPv6 proto (raw) = 0
+IPv6 packet send from bbbb::f0c4:1da0:fa92:1394 to aaaa::212:4b00:40e:fa81
+Checking MTU: 112 <= 1500 ?
+Is multicast? 0
+
+--- NEXT HOP DETERMINATION ---
+Destination is OFF-LINK
+Looking for route...
+uip-ds6-route: Looking up route for aaaa::212:4b00:40e:fa81
+uip-ds6-route: No route found
+NO ROUTE found
+SMARTBRIDGE check
+WSN net prefix: aaaa::
+Eth net prefix: aaaa::
+Dest IPaddr: aaaa::212:4b00:40e:fa81
+SMARTBRIDGE: treating as ON-LINK
+
+Selected nexthop = aaaa::212:4b00:40e:fa81
+Updating RPL header...
+RPL update OK
+Looking for neighbor entry...
+tcpip_ipv6_output: nbr cache entry incomplete
+=== PACKET_INPUT END ===
+
+=== AFTER tcpip_input ===
+uip_len = 0
+PROTO = 0
+SRC: bbbb::f0c4:1da0:fa92:1394
+DST: aaaa::212:4b00:40e:fa81
+srcport=14848 dstport=25348 flags=0xc0
+[PROTO] Start proto = 0
+[PROTO] Inspect header = 0, ext_len = 0
+[PROTO] HBH header
+[PROTO] ERROR: out of bounds (ext_len=0, uip_len=0)
+[REAL_PROTO] before = 0, detected = 0
+[DEBUG] get_real_proto = 0
+[CHECK] Not TCP, skip
+DBG: TCP destport raw = 0x0463, ntohs = 25348
+SRC_after: bbbb::f0c4:1da0:fa92:1394
+DST_after: aaaa::212:4b00:40e:fa81
+srcport_after=14848 dstport_after=25348 flags_after=0xc0
+SRC_tcp_syn: bbbb::f0c4:1da0:fa92:1394
+DST_tcp_syn: aaaa::212:4b00:40e:fa81
+------------END sicslowpan_input-----------------------------------

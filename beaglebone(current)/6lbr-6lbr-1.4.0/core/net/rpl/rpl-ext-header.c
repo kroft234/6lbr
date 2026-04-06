@@ -50,7 +50,8 @@
 #include "net/rpl/rpl-private.h"
 #include "net/packetbuf.h"
 
-#define DEBUG DEBUG_NONE
+/*#define DEBUG DEBUG_NONE*/
+#define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
 #include <limits.h>
@@ -255,10 +256,12 @@ rpl_update_header_empty(void)
        RPL_HDR_OPT_FWD_ERR should be flagged. */
     if((UIP_EXT_HDR_OPT_RPL_BUF->flags & RPL_HDR_OPT_DOWN)) {
       if(uip_ds6_route_lookup(&UIP_IP_BUF->destipaddr) == NULL) {
+#if CETIC_6LBR_SMARTBRIDGE
+        PRINTF("RPL: No route found, but SmartBridge mode - ignoring error\n");
+        /* Не дропаем пакет, позволяем ему уйти в Ethernet */
+#else
         UIP_EXT_HDR_OPT_RPL_BUF->flags |= RPL_HDR_OPT_FWD_ERR;
         PRINTF("RPL forwarding error\n");
-        /* We should send back the packet to the originating parent,
-           but it is not feasible yet, so we send a No-Path DAO instead */
         PRINTF("RPL generate No-Path DAO\n");
         parent = rpl_get_parent((uip_lladdr_t *)packetbuf_addr(PACKETBUF_ADDR_SENDER));
         if(parent != NULL) {
@@ -266,8 +269,10 @@ rpl_update_header_empty(void)
         }
         /* Drop packet */
         return 1;
+#endif
       }
-    } else {
+    }
+ else {
       /* Set the down extension flag correctly as described in Section
          11.2 of RFC6550. If the packet progresses along a DAO route,
          the down flag should be set. */

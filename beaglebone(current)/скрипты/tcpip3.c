@@ -284,106 +284,14 @@ start_periodic_tcp_timer(void)
   }
 }
 /*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
-/* Получить РЕАЛЬНЫЙ протокол (TCP/UDP/ICMP), учитывая extension headers */
-uint8_t get_real_proto(void)
-{
-  uint8_t *nexthdr = &UIP_IP_BUF->proto;
-  uint16_t ext_len = 0;
-
-  PRINTF("[PROTO] Start proto = %u\n", *nexthdr);
-
-  while(1) {
-    PRINTF("[PROTO] Inspect header = %u, ext_len = %u\n", *nexthdr, ext_len);
-
-    switch(*nexthdr) {
-
-      case UIP_PROTO_HBHO:
-        PRINTF("[PROTO] HBH header\n");
-        break;
-
-      case UIP_PROTO_DESTO:
-        PRINTF("[PROTO] DESTO header\n");
-        break;
-
-      case UIP_PROTO_ROUTING:
-        PRINTF("[PROTO] ROUTING header\n");
-        break;
-
-      case UIP_PROTO_FRAG:
-        PRINTF("[PROTO] FRAG header\n");
-        break;
-
-      case UIP_PROTO_NONE:
-        PRINTF("[PROTO] NONE header -> stop\n");
-        return UIP_PROTO_NONE;
-
-      default:
-        PRINTF("[PROTO] FINAL proto = %u\n", *nexthdr);
-        return *nexthdr;
-    }
-
-    /* ================== ВОТ СЮДА ДОБАВЛЯЕМ ================== */
-
-    /* Проверка: не вылезли ли за пределы пакета */
-    if((UIP_LLH_LEN + UIP_IPH_LEN + ext_len + 8) > uip_len) {
-      PRINTF("[PROTO] ERROR: out of bounds (ext_len=%u, uip_len=%u)\n",
-             ext_len, uip_len);
-      return *nexthdr;
-    }
-
-    /* ======================================================= */
-
-    struct uip_ext_hdr *ext = (struct uip_ext_hdr *)
-      &uip_buf[UIP_LLH_LEN + UIP_IPH_LEN + ext_len];
-
-    PRINTF("[PROTO] ext->next = %u, ext->len = %u\n", ext->next, ext->len);
-
-    nexthdr = &ext->next;
-    ext_len += (ext->len << 3) + 8;
-
-    /* (опционально, но очень полезно) */
-    if(ext_len > UIP_BUFSIZE) {
-      PRINTF("[PROTO] ERROR: ext_len overflow (%u)\n", ext_len);
-      return *nexthdr;
-    }
-  }
-}
-/*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
 /* FORWARD NAT: любой TCP-пакет на порт 22 > переписываем dst aaaa:: > bbbb:: */
 void check_for_tcp_syn(void)
 {
-
-  uint8_t before = UIP_IP_BUF->proto;
-  uint8_t proto = before;
-
-  if(before == 0) {
-    proto = get_real_proto();
-    printf("[REAL_PROTO] before = %u, detected = %u\n", before, proto);
-  }
-  PRINTF("[DEBUG] get_real_proto = %u\n", proto);
-  if (proto != UIP_PROTO_TCP) {
-    PRINTF("[CHECK] Not TCP, skip\n");
-      printf("DBG: TCP destport raw = 0x%04x, ntohs = %u\n",
-       UIP_TCP_BUF->destport, uip_ntohs(UIP_TCP_BUF->destport));
+  if (UIP_IP_BUF->proto != UIP_PROTO_TCP) {
     return;
   }
-  PRINTF("[CHECK] TCP detected!\n");
 
-  printf("DBG: TCP destport raw = 0x%04x, ntohs = %u\n",
-       UIP_TCP_BUF->destport, uip_ntohs(UIP_TCP_BUF->destport));
-  // новый вариант: учитываем ext-header
-  uint8_t ext_len = uip_ext_len; // длина ext-header, которая уже вычисляется в tcpip_input
-  struct uip_tcpip_hdr *tcp = (struct uip_tcpip_hdr *)(uip_buf + UIP_LLH_LEN + ext_len);
-  uint16_t dst_port = uip_ntohs(tcp->destport);
-  uint16_t src_port = uip_ntohs(tcp->srcport);
-
-  printf("DBG_REAL: srcport=%u dstport=%u flags=0x%02x\n",
-         src_port, dst_port, tcp->flags);
-
+  uint16_t dst_port = uip_ntohs(UIP_TCP_BUF->destport);
   if (dst_port != SSH_PORT) {
     return;
   }
@@ -394,7 +302,7 @@ void check_for_tcp_syn(void)
   printf("srcport=%u dstport=%u flags=0x%02x\n",
          uip_ntohs(UIP_TCP_BUF->srcport), dst_port, UIP_TCP_BUF->flags);
 
-  // --- NAT TABLE (Ищем свободный слот в NAT) ---
+  // --- NAT TABLE ---
   struct nat_entry *e = NULL;
   for (int i = 0; i < NAT_TABLE_SIZE; i++) {
     if (!nat_table[i].valid) {
@@ -402,7 +310,6 @@ void check_for_tcp_syn(void)
       break;
     }
   }
- // если нет места — переписываем 0
   if (!e) {
     printf("NAT table full > overwrite slot 0\n");
     e = &nat_table[0];
@@ -410,26 +317,30 @@ void check_for_tcp_syn(void)
 
   // сохраняем оригинальный src (для reverse NAT)
   uip_ip6addr_copy(&e->orig_src, &UIP_IP_BUF->srcipaddr);
-  e->orig_src_port = src_port;
+  e->orig_src_port = uip_ntohs(UIP_TCP_BUF->srcport);
   e->new_dst_port = SSH_PORT;
   e->valid = 1;
 
-  // --- НОВЫЙ DST---
-  uip_ip6addr(&e->new_dst, 0xbbbb, 0, 0, 0, 0x212, 0x4b00, 0x40e, 0xfa83);
+  // --- НОВЫЙ DST = aaaa::1 ---
+  uip_ip6addr(&e->new_dst, 0xaaaa, 0, 0, 0, 0, 0, 0, 1);
 
   // переписываем пакет
   uip_ip6addr_copy(&UIP_IP_BUF->destipaddr, &e->new_dst);
   UIP_TCP_BUF->destport = uip_htons(SSH_PORT);
 
   // пересчёт checksum
-  tcp->tcpchksum = 0;
+  UIP_TCP_BUF->tcpchksum = 0;
   uint16_t new_sum = uip_tcpchksum();
-  tcp->tcpchksum = ~new_sum;
+  UIP_TCP_BUF->tcpchksum = ~new_sum;
 
   printf("Rewritten > DST: ");
   print_ip6("", &UIP_IP_BUF->destipaddr);
   printf("TCP checksum after: 0x%04x\n",
-         uip_ntohs(tcp->tcpchksum));
+         uip_ntohs(UIP_TCP_BUF->tcpchksum));
+
+  // ВАЖНО: ничего больше не делаем!
+  // НЕ вызываем slip_send()
+  // НЕ обнуляем uip_len
 }
 /*---------------------------------------------------------------------------*/
 
@@ -453,11 +364,9 @@ void check_nat_reverse(void)
     if (!nat_table[i].valid) continue;
 
     // Матчим по: src == сохранённый сервер (new_dst) И dst_port == оригинальный клиентский порт
-    if(uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr, &nat_table[i].new_dst) &&
-           src_port == nat_table[i].new_dst_port &&
-           uip_ip6addr_cmp(&UIP_IP_BUF->destipaddr, &nat_table[i].orig_src) &&
-           dst_port == nat_table[i].orig_src_port)
-     {
+    if (uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr, &nat_table[i].new_dst) &&
+        dst_port == nat_table[i].orig_src_port) {
+
       printf(">>> REVERSE NAT MATCH slot %d <<<\n", i);
       print_ip6("Restoring src to original client: ", &nat_table[i].orig_src);
 
@@ -487,21 +396,21 @@ packet_input(void)
 
 #if UIP_CONF_IP_FORWARD
 
-  PRINTF("\n=============================\n");
-  PRINTF("=== PACKET_INPUT START ===\n");
-  PRINTF("uip_len = %u\n", uip_len);
+  print("\n=============================\n");
+  print("=== PACKET_INPUT START ===\n");
+  print("uip_len = %u\n", uip_len);
 
   if(uip_len > 0) {
 
-    PRINTF("Next header (proto) = %u\n", UIP_IP_BUF->proto);
-    PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
-    PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+    print("Next header (proto) = %u\n", UIP_IP_BUF->proto);
+    print("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
+    print("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
     if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
-      PRINTF("TCP SRC port = %u\n", uip_ntohs(UIP_TCP_BUF->srcport));
-      PRINTF("TCP DST port = %u\n", uip_ntohs(UIP_TCP_BUF->destport));
-      PRINTF("TCP flags = 0x%02x\n", UIP_TCP_BUF->flags);
-      PRINTF("TCP checksum = 0x%04x\n",
+      print("TCP SRC port = %u\n", uip_ntohs(UIP_TCP_BUF->srcport));
+      print("TCP DST port = %u\n", uip_ntohs(UIP_TCP_BUF->destport));
+      print("TCP flags = 0x%02x\n", UIP_TCP_BUF->flags);
+      print("TCP checksum = 0x%04x\n",
              uip_ntohs(UIP_TCP_BUF->tcpchksum));
     }
 
@@ -516,24 +425,26 @@ packet_input(void)
 
       tcpip_is_forwarding = 0;
 
-      PRINTF("--- BEFORE NAT ---\n");
-      PRINTF("DST before: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+      print("--- BEFORE NAT ---\n");
+      print("DST before: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
       check_for_tcp_syn();
-      PRINTF("--- AFTER NAT ---\n");
-      PRINTF("DST after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
+      print("--- AFTER NAT ---\n");
+      print("DST after: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
 
-      // Проверяем, SSH ли пакет
-      /*if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
-         uip_ntohs(UIP_TCP_BUF->destport) == 22) {
+     /* ВСТАВИТЬ ВОТ ЭТО */
+     if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
 
-      // Forward на Linux
-      tapdev_send();
+     uint16_t dport = uip_ntohs(UIP_TCP_BUF->destport);
 
-      uip_len = 0; // пакет обработан
-      tcpip_is_forwarding = 0;
-      return;
-      }*/
+     if(dport == 22) { // SSH
+
+       PRINTF("FORWARD TO LINUX via tapdev_send()\n");
+       tapdev_send();   // ?? отправка в Linux
+       return;          // ? КРИТИЧНО: не идём дальше в стек
+       }
+     }
+     /* ДО СЮДА */
 
       print("Calling uip_input()\n");
       uip_input();
@@ -543,15 +454,15 @@ packet_input(void)
       if(uip_len > 0) {
 
 #if UIP_CONF_TCP_SPLIT
-        PRINTF("uip_split_output()\n");
+        print("uip_split_output()\n");
         uip_split_output();
 #else
 
 #if NETSTACK_CONF_WITH_IPV6
-        PRINTF("tcpip_ipv6_output()\n");
+        print("tcpip_ipv6_output()\n");
         tcpip_ipv6_output();
 #else
-        PRINTF("tcpip_output(), len=%d\n", uip_len);
+        print("tcpip_output(), len=%d\n", uip_len);
         tcpip_output();
 #endif
 
@@ -566,39 +477,22 @@ packet_input(void)
 
   if(uip_len > 0) {
 
-    PRINTF("\n=== PACKET_INPUT (NO FORWARD) ===\n");
-    /*PRINTF("uip_len = %u\n", uip_len);
-    PRINTF("proto = %u\n", UIP_IP_BUF->proto);
+    /*print("\n=== PACKET_INPUT (NO FORWARD) ===\n");
+    print("uip_len = %u\n", uip_len);
+    print("proto = %u\n", UIP_IP_BUF->proto);
 
     if(UIP_IP_BUF->proto == UIP_PROTO_TCP) {
-      PRINTF("TCP DST port = %u\n",
+      print("TCP DST port = %u\n",
              uip_ntohs(UIP_TCP_BUF->destport));
-      PRINTF("TCP flags = 0x%02x\n",
+      print("TCP flags = 0x%02x\n",
              UIP_TCP_BUF->flags);
     }*/
 
     check_for_tcp_syn();
-
-  // --- ТВОЙ FORWARD ---
-  /*if(UIP_IP_BUF->proto == UIP_PROTO_TCP &&
-     uip_ntohs(UIP_TCP_BUF->destport) == 22) {
-
-    PRINTF(">>> MANUAL FORWARD TO TAP <<<\n");
-
-    PRINTF("SRC: "); PRINT6ADDR(&UIP_IP_BUF->srcipaddr); PRINTF("\n");
-    PRINTF("DST: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
-
-    tapdev_send();
-
-    uip_len = 0;   // ОЧЕНЬ ВАЖНО
-    return;
-  }*/
-
-     // --- обычная обработка ---
-    /*PRINTF("Calling uip_input()\n");*/
+    /*print("Calling uip_input()\n");*/
     uip_input();
 
-    /*PRINTF("After uip_input(), uip_len=%u\n", uip_len);*/
+    /*print("After uip_input(), uip_len=%u\n", uip_len);*/
 
     if(uip_len > 0) {
 
@@ -614,10 +508,9 @@ packet_input(void)
     }
   }
 
-PRINTF("=== PACKET_INPUT END ===\n");
 #endif
 
-  /*PRINTF("=== PACKET_INPUT END ===\n");*/
+  /*print("=== PACKET_INPUT END ===\n");*/
 }
 /*---------------------------------------------------------------------------*/
 #if UIP_TCP
@@ -931,17 +824,10 @@ tcpip_inputfunc(void)
 void
 tcpip_ipv6_output(void)
 {
-  PRINTF("\n========== TCPIP_IPV6_OUTPUT START ==========\n");
-
   uip_ds6_nbr_t *nbr = NULL;
   uip_ipaddr_t *nexthop;
 
-  PRINTF("uip_len = %u\n", uip_len);
-  PRINTF("uip_ext_len = %u\n", uip_ext_len);
-  PRINTF("IPv6 proto (raw) = %u\n", UIP_IP_BUF->proto);
-
   if(uip_len == 0) {
-    PRINTF("Packet length is 0 > EXIT\n");
     return;
   }
 
@@ -951,26 +837,19 @@ tcpip_ipv6_output(void)
   PRINT6ADDR(&UIP_IP_BUF->destipaddr);
   PRINTF("\n");
 
-  PRINTF("Checking MTU: %u <= %u ?\n", uip_len, UIP_LINK_MTU);
   if(uip_len > UIP_LINK_MTU) {
-    PRINTF("ERROR: Packet too big > DROP\n");
     UIP_LOG("tcpip_ipv6_output: Packet to big");
     uip_clear_buf();
     return;
   }
 
   if(uip_is_addr_unspecified(&UIP_IP_BUF->destipaddr)){
-    PRINTF("ERROR: Destination is UNSPECIFIED > DROP\n");
     UIP_LOG("tcpip_ipv6_output: Destination address unspecified");
     uip_clear_buf();
     return;
   }
 
-  PRINTF("Is multicast? %d\n", uip_is_addr_mcast(&UIP_IP_BUF->destipaddr));
-
   if(!uip_is_addr_mcast(&UIP_IP_BUF->destipaddr)) {
-
-    PRINTF("\n--- NEXT HOP DETERMINATION ---\n");
     /* Next hop determination */
     nbr = NULL;
 
@@ -978,52 +857,24 @@ tcpip_ipv6_output(void)
        link. If so, we simply use the destination address as our
        nexthop address. */
     if(uip_ds6_is_addr_onlink(&UIP_IP_BUF->destipaddr)){
-     PRINTF("Destination is ON-LINK > nexthop = dest\n");
       nexthop = &UIP_IP_BUF->destipaddr;
     } else {
-      PRINTF("Destination is OFF-LINK\n");
       uip_ds6_route_t *route;
       /* Check if we have a route to the destination address. */
-      PRINTF("Looking for route...\n");
       route = uip_ds6_route_lookup(&UIP_IP_BUF->destipaddr);
 
       /* No route was found - we send to the default route instead. */
       if(route == NULL) {
-        PRINTF("NO ROUTE found\n");
-
 #if CETIC_6LBR_SMARTBRIDGE
-        PRINTF("SMARTBRIDGE check\n");
-        PRINTF("WSN net prefix: "); PRINT6ADDR(&wsn_net_prefix); PRINTF("\n");
-        PRINTF("Eth net prefix: "); PRINT6ADDR(&eth_net_prefix); PRINTF("\n");
-        PRINTF("Dest IPaddr: "); PRINT6ADDR(&UIP_IP_BUF->destipaddr); PRINTF("\n");
-        PRINTF("Our ETH IP addr: "); PRINT6ADDR(&eth_ip_addr); PRINTF("\n");
-
-        /* Проверяем: адрес назначения равен нашему локальному ETH IP? */
-        if (uip_ipaddr_cmp(&UIP_IP_BUF->destipaddr, &eth_ip_addr)) {
-          PRINTF("SMARTBRIDGE: Destination is our ETH IP (aaaa::fa82), send via Ethernet\n");
-          /* Убираем RPL заголовок перед отправкой на Ethernet */
-#if UIP_CONF_IPV6_RPL
-          rpl_remove_header();
-#endif
-          /* Используем fallback интерфейс для отправки на Ethernet */
-#ifdef UIP_FALLBACK_INTERFACE
-          IP64_CONF_UIP_FALLBACK_INTERFACE.output();
-#else
-          PRINTF("SMARTBRIDGE: No fallback interface, dropping packet\n");
-#endif
-          uip_len = 0;
-          uip_ext_len = 0;
-          return;
-        } else if (uip_ipaddr_prefixcmp(&wsn_net_prefix, &UIP_IP_BUF->destipaddr, 64) ||
-            uip_ipaddr_prefixcmp(&eth_net_prefix, &UIP_IP_BUF->destipaddr, 64)) {
-          PRINTF("SMARTBRIDGE: treating as ON-LINK\n");
+        if (uip_ipaddr_prefixcmp(&wsn_net_prefix, &UIP_IP_BUF->destipaddr, 64)) {
+          /* In smart-bridge mode, there is no route towards hosts on the Ethernet side
+          Therefore we have to check the destination and assume the host is on-link */
           nexthop = &UIP_IP_BUF->destipaddr;
         } else
 #endif
 #if CETIC_6LBR_ROUTER
         if (uip_ipaddr_prefixcmp(&wsn_net_prefix, &UIP_IP_BUF->destipaddr, 64)) {
           //In router mode, we drop packets towards unknown mote
-          PRINTF("ROUTER MODE: dropping unknown mote\n");
           PRINTF("Dropping wsn packet with no route\n");
           uip_len = 0;
           return;
@@ -1031,12 +882,9 @@ tcpip_ipv6_output(void)
 #endif
 #if CETIC_6LBR_IP64
         if(ip64_addr_is_ip64(&UIP_IP_BUF->destipaddr)) {
-          PRINTF("IP64 fallback path\n");
 #if UIP_CONF_IPV6_RPL
-          PRINTF("Removing RPL header before fallback\n");
           rpl_remove_header();
 #endif
-          PRINTF("Calling IP64 output\n");
           IP64_CONF_UIP_FALLBACK_INTERFACE.output();
           uip_len = 0;
           uip_ext_len = 0;
@@ -1046,35 +894,19 @@ tcpip_ipv6_output(void)
 #endif
         {
           PRINTF("tcpip_ipv6_output: no route found, using default route\n");
-          PRINTF("Using DEFAULT ROUTE\n");
           nexthop = uip_ds6_defrt_choose();
         }
         if(nexthop == NULL) {
-
-          PRINTF("ERROR: Default route is NULL\n");
-
-#if CETIC_6LBR_SMARTBRIDGE
-          /* If SMARTBRIDGE mode and destination is our local address, deliver locally */
-          if (uip_ds6_is_my_addr(&UIP_IP_BUF->destipaddr)) {
-            PRINTF("SMARTBRIDGE: delivering locally (nexthop NULL)\n");
-            uip_clear_buf();
-            return;
-          }
-#endif
-
 #ifdef UIP_FALLBACK_INTERFACE
 	  PRINTF("FALLBACK: removing ext hdrs & setting proto %d %d\n", 
 		 uip_ext_len, *((uint8_t *)UIP_IP_BUF + 40));
 	  if(uip_ext_len > 0) {
 	    extern void remove_ext_hdr(void);
 	    uint8_t proto = *((uint8_t *)UIP_IP_BUF + 40);
-            PRINTF("Saved proto from ext header = %u\n", proto);
 	    remove_ext_hdr();
 	    /* This should be copied from the ext header... */
 	    UIP_IP_BUF->proto = proto;
-            PRINTF("Restored proto = %u\n", UIP_IP_BUF->proto);
 	  }
-          PRINTF("Calling fallback output\n");
 	  UIP_FALLBACK_INTERFACE.output();
 #else
           PRINTF("tcpip_ipv6_output: Destination off-link but no route\n");
@@ -1086,17 +918,11 @@ tcpip_ipv6_output(void)
       } else {
         /* A route was found, so we look up the nexthop neighbor for
            the route. */
-        PRINTF("Route FOUND\n");
         nexthop = uip_ds6_route_nexthop(route);
-
-        PRINTF("Route nexthop = ");
-        PRINT6ADDR(nexthop);
-        PRINTF("\n");
 
         /* If the nexthop is dead, for example because the neighbor
            never responded to link-layer acks, we drop its route. */
         if(nexthop == NULL) {
-          PRINTF("ERROR: nexthop is NULL > removing route\n");
 #if UIP_CONF_IPV6_RPL
           /* If we are running RPL, and if we are the root of the
              network, we'll trigger a DIO before we remove
@@ -1105,7 +931,6 @@ tcpip_ipv6_output(void)
 
           dag = (rpl_dag_t *)route->state.dag;
           if(dag != NULL) {
-            PRINTF("Triggering RPL DIO reset\n");
             rpl_reset_dio_timer(dag->instance);
           }
 #endif /* UIP_CONF_IPV6_RPL */
@@ -1116,11 +941,6 @@ tcpip_ipv6_output(void)
           return;
         }
       }
-
-    PRINTF("\nSelected nexthop = ");
-    PRINT6ADDR(nexthop);
-    PRINTF("\n");
-
 #if TCPIP_CONF_ANNOTATE_TRANSMISSIONS
       if(nexthop != NULL) {
         static uint8_t annotate_last;
@@ -1139,23 +959,15 @@ tcpip_ipv6_output(void)
     /* End of next hop determination */
 
 #if UIP_CONF_IPV6_RPL
-    PRINTF("Updating RPL header...\n");
     if(rpl_update_header_final(nexthop)) {
-      PRINTF("RPL update FAILED > DROP\n");
       uip_clear_buf();
       return;
     }
-    PRINTF("RPL update OK\n");
 #endif /* UIP_CONF_IPV6_RPL */
-
-    PRINTF("Looking for neighbor entry...\n");
     nbr = uip_ds6_nbr_lookup(nexthop);
     if(nbr == NULL) {
-      PRINTF("Neighbor NOT FOUND > creating\n");
-
 #if UIP_ND6_SEND_NA
       if((nbr = uip_ds6_nbr_add(nexthop, NULL, 0, NBR_INCOMPLETE)) == NULL) {
-        PRINTF("ERROR: cannot allocate neighbor > DROP\n");
         uip_clear_buf();
         return;
       } else {
@@ -1204,8 +1016,6 @@ tcpip_ipv6_output(void)
       /* Send in parallel if we are running NUD (nbc state is either STALE,
          DELAY, or PROBE). See RFC 4861, section 7.3.3 on node behavior. */
       if(nbr->state == NBR_STALE) {
-
-        PRINTF("Neighbor STALE > switching to DELAY\n");
         nbr->state = NBR_DELAY;
         stimer_set(&nbr->reachable, UIP_ND6_DELAY_FIRST_PROBE_TIME);
         nbr->nscount = 0;
@@ -1213,7 +1023,6 @@ tcpip_ipv6_output(void)
       }
 #endif /* UIP_ND6_SEND_NA */
 
-      PRINTF("Sending packet to MAC layer\n");
       tcpip_output(uip_ds6_nbr_get_ll(nbr));
 
 #if UIP_CONF_IPV6_QUEUE_PKT
@@ -1227,27 +1036,17 @@ tcpip_ipv6_output(void)
         uip_len = uip_packetqueue_buflen(&nbr->packethandle);
         memcpy(UIP_IP_BUF, uip_packetqueue_buf(&nbr->packethandle), uip_len);
         uip_packetqueue_free(&nbr->packethandle);
-
-      PRINTF("Sending packet to MAC layer2\n");
         tcpip_output(uip_ds6_nbr_get_ll(nbr));
-
-      PRINTF("Packet sent\n");
       }
 #endif /*UIP_CONF_IPV6_QUEUE_PKT*/
 
       uip_clear_buf();
       return;
-
-      PRINTF("Buffer cleared\n");
-
-      PRINTF("========== TCPIP_IPV6_OUTPUT END ==========\n");
     }
   }
   /* Multicast IP destination address. */
-  PRINTF("Multicast destination > direct send\n");
   tcpip_output(NULL);
   uip_clear_buf();
-  PRINTF("Neighbor created, sending NS\n");
 }
 #endif /* NETSTACK_CONF_WITH_IPV6 */
 /*---------------------------------------------------------------------------*/
