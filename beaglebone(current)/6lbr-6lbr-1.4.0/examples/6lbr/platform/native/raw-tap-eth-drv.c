@@ -62,10 +62,22 @@ uint8_t *ethernet_tmp_buf = ethernet_tmp_buf_aligned.u8;
 void
 eth_drv_send(uint8_t *packet, uint16_t len)
 {
+  printf(">>> eth_drv_send called, len=%d\n", len);
+  printf("write: %d\n", len);
+
+  // Печатаем первые байты пакета
+  printf(">>> packet data: ");
+  for(int i = 0; i < len && i < 20; i++) {
+    printf("%02x ", packet[i]);
+  }
+  printf("\n");
+
   LOG6LBR_PRINTF(PACKET, ETH_OUT, "write: %d\n", len);
   LOG6LBR_DUMP_PACKET(ETH_OUT, packet, len);
 
   tun_output(packet, len);
+
+  printf(">>> eth_drv_send done\n");
 }
 /*---------------------------------------------------------------------------*/
 void

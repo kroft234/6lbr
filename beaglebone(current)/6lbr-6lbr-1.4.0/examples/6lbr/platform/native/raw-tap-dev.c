@@ -6,7 +6,7 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
+ * 1. Redistributions of source code must retain the above copyright 
  *    notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
@@ -355,10 +355,13 @@ tun_init()
 void
 tun_output(uint8_t * data, int len)
 {
+  printf(">>> tun_output called, len=%d\n", len);
   if(write(tunfd, data, len) != len) {
+    printf(">>> tun_output ERROR: %s\n", strerror(errno));
     LOG6LBR_FATAL("write() : %s\n", strerror(errno));
     exit(1);
   }
+  printf(">>> tun_output done, write %d bytes\n", len);
   LOG6LBR_PRINTF(PACKET, TAP_OUT, "write: %d\n", len);
 }
 /*---------------------------------------------------------------------------*/

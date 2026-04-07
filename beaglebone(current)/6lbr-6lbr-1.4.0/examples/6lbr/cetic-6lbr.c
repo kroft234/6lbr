@@ -223,19 +223,27 @@ cetic_6lbr_init(void)
     // PC1 адрес: aaaa::212:4b00:40e:fa85
     uip_ip6addr(&pc1_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa85);
     
-    // PC1 MAC адрес (замени на реальный MAC PC1)
-    pc1_lladdr.addr[0] = 0x02;  // Example MAC - ЗАМЕНИ НА РЕАЛЬНЫЙ
+    // PC1 MAC адрес 
+    pc1_lladdr.addr[0] = 0x00;
     pc1_lladdr.addr[1] = 0x12;
     pc1_lladdr.addr[2] = 0x4b;
-    pc1_lladdr.addr[3] = 0xFF;
-    pc1_lladdr.addr[4] = 0x04;
-    pc1_lladdr.addr[5] = 0x0e;
-    pc1_lladdr.addr[6] = 0xfa;
-    pc1_lladdr.addr[7] = 0x85;
-    
+    pc1_lladdr.addr[3] = 0xFF;  // МЕТКА
+    pc1_lladdr.addr[4] = 0xFF;  // МЕТКА
+    pc1_lladdr.addr[5] = 0x00;
+    pc1_lladdr.addr[6] = 0x00;
+    pc1_lladdr.addr[7] = 0x85;    
     // Добавляем в neighbor cache со статуса NBR_REACHABLE
     uip_ds6_nbr_add(&pc1_ip, &pc1_lladdr, 0, NBR_REACHABLE);
     LOG6LBR_6ADDR(INFO, &pc1_ip, "Added Ethernet host to neighbor cache: ");
+    LOG6LBR_INFO("Neighbor added for fa85, checking state...\n");
+
+    // Проверим что сосед добавлен
+    uip_ds6_nbr_t *nbr = uip_ds6_nbr_lookup(&pc1_ip);
+    if(nbr != NULL) {
+      LOG6LBR_INFO("Neighbor found, state: %d\n", nbr->state);
+    } else {
+      LOG6LBR_ERROR("Neighbor NOT found after add!\n");
+    }
   }
   // ==========================================================
 
@@ -569,7 +577,9 @@ PROCESS_THREAD(cetic_6lbr_process, ev, data)
   node_info_init();
 #endif
 
+  LOG6LBR_INFO(">>> BEFORE packet_filter_init\n");
   packet_filter_init();
+  LOG6LBR_INFO(">>> AFTER packet_filter_init\n");
 
   cetic_6lbr_init();
 
@@ -606,7 +616,8 @@ PROCESS_THREAD(cetic_6lbr_process, ev, data)
     uip_ip6addr(&nexthop_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
 
     /* 3. Используем _add_static, чтобы обойти проверку neighbor table */
-    route = uip_ds6_route_add_static(&dest_ip, 128, &nexthop_ip);
+    //route = uip_ds6_route_add_static(&dest_ip, 128, &nexthop_ip);
+    route = uip_ds6_route_add_static(&dest_ip, 128, &dest_ip);
     
     if(route != NULL) {
       LOG6LBR_INFO("Static route added: aaaa::212:4b00:40e:fa85/128 (on-link)\n");

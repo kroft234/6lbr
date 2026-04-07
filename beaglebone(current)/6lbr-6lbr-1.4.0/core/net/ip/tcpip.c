@@ -167,7 +167,23 @@ tcpip_output(const uip_lladdr_t *a)
 {
   int ret;
   if(outputfunc != NULL) {
+    PRINTF(">>> tcpip_output: outputfunc called with MAC: ");
+    if(a != NULL) {
+      PRINTF("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+        a->addr[0], a->addr[1], a->addr[2], a->addr[3],
+        a->addr[4], a->addr[5], a->addr[6], a->addr[7]);
+      if(a->addr[3] == 0xFF && a->addr[4] == 0xFF) {
+        PRINTF(">>> ETHERNET MAC DETECTED! SHOULD GO TO ETH!\n");
+      }
+    }
+    printf(">>> tcpip_output: calling outputfunc=%p\n", (void*)outputfunc);
+    printf(">>> outputfunc address = %p\n", (void*)outputfunc);
+    /*printf(">>> a = %p, MAC = %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+           (void*)a, 
+           a->addr[0], a->addr[1], a->addr[2], a->addr[3],
+           a->addr[4], a->addr[5], a->addr[6], a->addr[7]); */
     ret = outputfunc(a);
+    printf(">>> tcpip_output: outputfunc returned=%d\n", ret);
     return ret;
   }
   UIP_LOG("tcpip_output: Use tcpip_set_outputfunc() to set an output function");
@@ -1000,7 +1016,7 @@ tcpip_ipv6_output(void)
 
         /* Проверяем: адрес назначения равен нашему локальному ETH IP? */
         if (uip_ipaddr_cmp(&UIP_IP_BUF->destipaddr, &eth_ip_addr)) {
-          PRINTF("SMARTBRIDGE: Destination is our ETH IP (aaaa::fa82), send via Ethernet\n");
+          PRINTF("SMARTBRIDGE: Destination is our ETH IP (aaaa::212:4b00:40e:fa82), send via Ethernet\n");
           /* Убираем RPL заголовок перед отправкой на Ethernet */
 #if UIP_CONF_IPV6_RPL
           rpl_remove_header();
@@ -1150,6 +1166,23 @@ tcpip_ipv6_output(void)
 
     PRINTF("Looking for neighbor entry...\n");
     nbr = uip_ds6_nbr_lookup(nexthop);
+
+    /* --- ВСТАВЬ ВОТ ЭТО СЮДА --- */
+    if(nbr != NULL) {
+      const uip_lladdr_t *ll = uip_ds6_nbr_get_ll(nbr);
+      PRINTF("Neighbor MAC: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+        ll->addr[0], ll->addr[1], ll->addr[2], ll->addr[3],
+        ll->addr[4], ll->addr[5], ll->addr[6], ll->addr[7]);
+      if(ll->addr[3] == 0xFF && ll->addr[4] == 0xFF) {
+        PRINTF(">>> ETHERNET MAC DETECTED <<<\n");
+      } else {
+        PRINTF(">>> 6LoWPAN MAC (NOT ETHERNET) <<<\n");
+      }
+    } else {
+      PRINTF("ERROR: Neighbor NOT FOUND\n");
+    }
+    /* --- КОНЕЦ ВСТАВКИ --- */
+
     if(nbr == NULL) {
       PRINTF("Neighbor NOT FOUND > creating\n");
 

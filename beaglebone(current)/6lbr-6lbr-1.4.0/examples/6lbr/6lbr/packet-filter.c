@@ -190,6 +190,9 @@ wireless_input(void)
 uint8_t
 wireless_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
 {
+
+  printf(">>> wireless_output CALLED\n");
+  LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> wireless_output CALLED\n");
   int ret;
 
   //Packet filtering
@@ -239,6 +242,8 @@ wireless_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
 void
 eth_input(void)
 {
+ printf(">>> eth_input called\n");
+ LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> eth_input called");
 #if CETIC_6LBR_TRANSPARENTBRIDGE || CETIC_6LBR_ONE_ITF || CETIC_6LBR_6LR
   uip_lladdr_t srcAddr;
 #endif
@@ -369,6 +374,9 @@ eth_input(void)
 static int
 eth_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
 {
+
+  printf(">>> eth_output CALLED\n");
+  LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> eth_output CALLED\n");
   if(IS_BROADCAST_ADDR(dest)) {
     LOG6LBR_PRINTF(PACKET, PF_OUT, "eth_output: broadcast\n");
   } else {
@@ -379,12 +387,14 @@ eth_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
   //----------------
   if(uip_len == 0) {
     LOG6LBR_ERROR("eth_output: uip_len = 0\n");
+    printf("eth_output: uip_len = 0\n");
     return 0;
   }
 
   if(dest && linkaddr_cmp((linkaddr_t *) dest,
       (linkaddr_t *) & eth_mac64_addr)) {
     LOG6LBR_ERROR("ethernet_output: sending to self\n");
+    printf("ethernet_output: sending to self\n");
     return 0;
   }
 
@@ -476,7 +486,9 @@ eth_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
   }
   //Sending packet
   //--------------
+  printf("eth_output: Sending packet to Ethernet\n");
   LOG6LBR_PRINTF(PACKET, PF_OUT, "eth_output: Sending packet to Ethernet\n");
+  printf("eth_drv_send input\n");
   eth_drv_send(uip_buf, uip_len + UIP_LLH_LEN);
 
   return 1;
@@ -489,18 +501,44 @@ eth_output(const uip_lladdr_t * src, const uip_lladdr_t * dest)
 static uint8_t
 bridge_output(const uip_lladdr_t * dest)
 {
+
+  printf(">>> bridge_output ENTERED\n");
+  if(dest == NULL) {
+    printf(">>> dest is NULL!\n");
+  } else {
+    printf(">>> MAC check: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+      dest->addr[0], dest->addr[1], dest->addr[2], dest->addr[3],
+      dest->addr[4], dest->addr[5], dest->addr[6], dest->addr[7]);
+  }
+  printf(">>> IS_EUI48_ADDR result: %d\n", IS_EUI48_ADDR(dest));
+  printf(">>> IS_EUI64_ADDR result: %d\n", IS_EUI64_ADDR(dest));
+  /*LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> bridge_output ENTERED\n");
+  LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> MAC check: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+    dest->addr[0], dest->addr[1], dest->addr[2], dest->addr[3],
+    dest->addr[4], dest->addr[5], dest->addr[6], dest->addr[7]);
+  LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> IS_EUI48_ADDR result: %d\n", IS_EUI48_ADDR(dest));
+  LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> IS_EUI64_ADDR result: %d\n", IS_EUI64_ADDR(dest));*/
+
   int isBroadcast = IS_BROADCAST_ADDR(dest);
   if(!isBroadcast) {
-    LOG6LBR_LLADDR_PRINTF(PACKET, PF_OUT, dest, "bridge_output: Sending packet to ");
+    //LOG6LBR_LLADDR_PRINTF(PACKET, PF_OUT, dest, "bridge_output: Sending packet to ");
+    printf("bridge_output: Sending packet\n");
   } else {
-    LOG6LBR_PRINTF(PACKET, PF_OUT, "bridge_output: Sending packet to Broadcast\n");
+    //LOG6LBR_PRINTF(PACKET, PF_OUT, "bridge_output: Sending packet to Broadcast\n");
+    printf("bridge_output: Sending packet to Broadcast\n");
   }
   //Filter WSN vs Ethernet segment traffic
   if(IS_EUI48_ADDR(dest)) {
+    //LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> EUI48 - using eth_output\n");
+    printf(">>> EUI48 - using eth_output\n");
     eth_output(NULL, dest);
   } else if(IS_EUI64_ADDR(dest)) {
+    //LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> EUI64 - using wireless_output\n");
+    printf(">>> EUI64 - using wireless_output\n");
     wireless_output(NULL, dest);
   } else {
+    //LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> UNKNOWN - using both\n");
+    printf(">>> UNKNOWN - using both\n");
     if (UIP_IP_BUF->proto != UIP_PROTO_ICMP6 || (UIP_ICMP_BUF->type != ICMP6_NS && UIP_ICMP_BUF->type != ICMP6_NA)) {
       wireless_output(NULL, dest);
     }
@@ -602,6 +640,9 @@ bridge_output(const uip_lladdr_t * dest)
 void
 packet_filter_init(void)
 {
+  //LOG6LBR_PRINTF(PACKET, PF_OUT, ">>> packet_filter_init called\n");
+  printf(">>> packet_filter_init called\n");  // Это точно выведется
+
   wireless_outputfunc = tcpip_get_outputfunc();
   tcpip_set_outputfunc(bridge_output);
 
