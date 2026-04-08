@@ -223,15 +223,15 @@ cetic_6lbr_init(void)
     // PC1 адрес: aaaa::212:4b00:40e:fa85
     uip_ip6addr(&pc1_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa85);
     
-    // PC1 MAC адрес 
-    pc1_lladdr.addr[0] = 0x00;
-    pc1_lladdr.addr[1] = 0x12;
-    pc1_lladdr.addr[2] = 0x4b;
+    // PC1 MAC адрес (реальный Ethernet MAC Windows PC)
+    pc1_lladdr.addr[0] = 0xc8;
+    pc1_lladdr.addr[1] = 0x4d;
+    pc1_lladdr.addr[2] = 0x44;
     pc1_lladdr.addr[3] = 0xFF;  // МЕТКА
     pc1_lladdr.addr[4] = 0xFF;  // МЕТКА
-    pc1_lladdr.addr[5] = 0x00;
-    pc1_lladdr.addr[6] = 0x00;
-    pc1_lladdr.addr[7] = 0x85;    
+    pc1_lladdr.addr[5] = 0x28;
+    pc1_lladdr.addr[6] = 0x11;
+    pc1_lladdr.addr[7] = 0xcd;   
     // Добавляем в neighbor cache со статуса NBR_REACHABLE
     uip_ds6_nbr_add(&pc1_ip, &pc1_lladdr, 0, NBR_REACHABLE);
     LOG6LBR_6ADDR(INFO, &pc1_ip, "Added Ethernet host to neighbor cache: ");
@@ -246,6 +246,29 @@ cetic_6lbr_init(void)
     }
   }
   // ==========================================================
+
+// === Добавляем BeagleBone (br0) в neighbor cache ===
+{
+  uip_ipaddr_t bb_ip;
+  uip_lladdr_t bb_lladdr;
+  
+  // BeagleBone br0 адрес: aaaa::fa86
+  uip_ip6addr(&bb_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+  
+  // BeagleBone MAC с меткой FF:FF
+  bb_lladdr.addr[0] = 0xe2;
+  bb_lladdr.addr[1] = 0x15;
+  bb_lladdr.addr[2] = 0x64;
+  bb_lladdr.addr[3] = 0xFF;  // МЕТКА
+  bb_lladdr.addr[4] = 0xFF;  // МЕТКА
+  bb_lladdr.addr[5] = 0x07;
+  bb_lladdr.addr[6] = 0xd0;
+  bb_lladdr.addr[7] = 0x8c;
+  
+  uip_ds6_nbr_add(&bb_ip, &bb_lladdr, 0, NBR_REACHABLE);
+  LOG6LBR_INFO("Added BeagleBone neighbor for fa86\n");
+}
+// ==========================================================
 
   if((nvm_data.mode & CETIC_MODE_WAIT_RA_MASK) == 0)    //Manual configuration
   {
@@ -603,21 +626,22 @@ PROCESS_THREAD(cetic_6lbr_process, ev, data)
   /* --- ДОБАВЛЕНИЕ СТАТИЧЕСКОГО МАРШРУТА (v1.4.0) --- */
   {
     uip_ipaddr_t dest_ip;
-    uip_ipaddr_t nexthop_ip;
+    uip_ipaddr_t bbb_net;
     uip_ds6_route_t *route;
+    uip_ds6_route_t *route_bbb;
 
     /* 1. Адрес назначения (PC1 в Ethernet) */
     uip_ip6addr(&dest_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa85);
    
     
-    /* 2. Next Hop. Так как PC1 в одной сети с Ethernet-интерфейсом моста,
-       указываем адрес самого PC1 (on-link маршрут). */
+    /* 2. Адрес назначения (BeagleBone в Ethernet) */
     //uip_ip6addr(&nexthop_ip, 0xfe80, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
-    uip_ip6addr(&nexthop_ip, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+    uip_ip6addr(&bbb_net, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
 
     /* 3. Используем _add_static, чтобы обойти проверку neighbor table */
     //route = uip_ds6_route_add_static(&dest_ip, 128, &nexthop_ip);
     route = uip_ds6_route_add_static(&dest_ip, 128, &dest_ip);
+    route_bbb = uip_ds6_route_add_static(&bbb_net, 128, &bbb_net);
     
     if(route != NULL) {
       LOG6LBR_INFO("Static route added: aaaa::212:4b00:40e:fa85/128 (on-link)\n");
@@ -625,22 +649,21 @@ PROCESS_THREAD(cetic_6lbr_process, ev, data)
       LOG6LBR_ERROR("Failed to add static route\n");
     }
 
+    if(route_bbb != NULL) {
+      LOG6LBR_INFO("Static route added: aaaa::212:4b00:40e:fa86/128 (on-link)\n");
+    } else {
+      LOG6LBR_ERROR("Failed to add static route\n");
+    }
+
+
     /* --- ГЛОБАЛЬНЫЙ АДРЕС --- */
-    uip_ipaddr_t ipaddr;
+    //uip_ipaddr_t ipaddr;
     /* Указываем адрес aaaa::fa86 */
-    uip_ip6addr(&ipaddr, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
+    //uip_ip6addr(&ipaddr, 0xaaaa, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
     
     /* Регистрируем его как адрес этого устройства */
-    uip_ds6_addr_add(&ipaddr, 0, ADDR_MANUAL);
-    LOG6LBR_INFO("Global IP added: aaaa::212:4b00:40e:fa86\n");
-
-    /* --- LINK-LOCAL АДРЕС --- */
-    /*uip_ipaddr_t lladdr;
-    uip_ip6addr(&lladdr, 0xfe80, 0, 0, 0, 0x0212, 0x4b00, 0x040e, 0xfa86);
-
-    uip_ds6_addr_add(&lladdr, 0, ADDR_MANUAL);
-    LOG6LBR_INFO("Link-local IP added: fe80::212:4b00:40e:fa86\n");*/
-
+    //uip_ds6_addr_add(&ipaddr, 0, ADDR_MANUAL);
+    //LOG6LBR_INFO("Global IP added: aaaa::212:4b00:40e:fa86\n");
 
   }
 /*-------------------------------------------------------------------------*/
